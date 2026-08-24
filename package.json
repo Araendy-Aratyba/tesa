@@ -1,0 +1,11 @@
+{
+  "name": "tesa-development-tools",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "lint:erb": "herb-lint"
+  },
+  "devDependencies": {
+    "@herb-tools/linter": "^0.10.3"
+  }
+}
