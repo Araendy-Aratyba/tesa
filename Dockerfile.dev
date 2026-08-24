@@ -1,0 +1,46 @@
+# syntax=docker/dockerfile:1
+# check=error=true
+
+ARG NODE_VERSION=24
+ARG RUBY_VERSION=3.4.6
+
+FROM docker.io/library/node:${NODE_VERSION}-bookworm-slim AS node
+
+FROM docker.io/library/ruby:${RUBY_VERSION}-slim
+
+WORKDIR /rails
+
+ENV RAILS_ENV="development" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_JOBS="4" \
+    BUNDLE_RETRY="3" \
+    BINDING="0.0.0.0"
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential \
+      curl \
+      git \
+      libpq-dev \
+      libvips \
+      libyaml-dev \
+      pkg-config \
+      postgresql-client && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+COPY --from=node /usr/local/ /usr/local/
+
+RUN npm install --global pnpm@11.19.0
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+
+ENTRYPOINT ["/rails/bin/docker-entrypoint-dev"]
+
+EXPOSE 3000
+CMD ["bin/dev"]

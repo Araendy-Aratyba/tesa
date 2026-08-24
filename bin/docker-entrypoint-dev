@@ -1,0 +1,13 @@
+#!/bin/bash -e
+
+# Prevent a stale PID from blocking the development server after a restart.
+rm -f /rails/tmp/pids/server.pid
+
+# Keep bind-mounted source checkouts in sync with the image dependencies.
+bundle check || bundle install
+pnpm install --frozen-lockfile
+
+# PostgreSQL is healthy before this runs because Compose waits for its healthcheck.
+bin/rails db:prepare
+
+exec "$@"
