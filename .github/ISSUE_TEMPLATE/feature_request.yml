@@ -1,0 +1,37 @@
+name: Propor uma melhoria
+description: Sugira uma funcionalidade ou evolução do Tesa.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Problema ou motivação
+      description: Qual necessidade de usuário ou interesse público esta proposta atende?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Solução proposta
+      description: Descreva o comportamento esperado sem limitar a discussão à implementação.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+      description: Liste soluções temporárias ou abordagens descartadas.
+  - type: textarea
+    id: source
+    attributes:
+      label: Fonte dos dados
+      description: Se aplicável, informe endpoints, documentação oficial e limitações conhecidas.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Verificações
+      options:
+        - label: Pesquisei issues e discussões e não encontrei uma proposta equivalente.
+          required: true
+        - label: A proposta respeita privacidade, acessibilidade e os termos das fontes de dados.
+          required: true

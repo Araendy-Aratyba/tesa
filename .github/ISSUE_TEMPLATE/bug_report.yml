@@ -1,0 +1,52 @@
+name: Relatar um bug
+description: Informe um comportamento incorreto ou inesperado.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: Obrigado por ajudar a melhorar o Tesa. Remova credenciais e dados pessoais antes de enviar.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Descrição do problema
+      description: Explique o que aconteceu e qual era o comportamento esperado.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Como reproduzir
+      description: Forneça passos mínimos e dados públicos ou anonimizados.
+      placeholder: |
+        1. Acesse...
+        2. Selecione...
+        3. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Ambiente
+      description: Informe versão ou commit, navegador, sistema operacional e forma de execução.
+      placeholder: |
+        Tesa: commit ou versão
+        Navegador:
+        Sistema operacional:
+        Execução: local, Dev Container ou Docker Compose
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs relevantes
+      description: Remova tokens, credenciais, cookies e dados pessoais antes de enviar.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Verificações
+      options:
+        - label: Pesquisei issues existentes e não encontrei uma duplicata.
+          required: true
+        - label: Removi credenciais e dados sensíveis do relato.
+          required: true
