@@ -1,5 +1,8 @@
 # Tesa
 
+[![CI](https://github.com/Araendy-Aratyba/tesa/actions/workflows/ci.yml/badge.svg)](https://github.com/Araendy-Aratyba/tesa/actions/workflows/ci.yml)
+[![License: AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue.svg)](LICENSE)
+
 Aplicação Rails para trabalhar com dados legislativos da Câmara dos Deputados, usando o cliente [CongregaPlenum](https://github.com/Araendy-Aratyba/CongregaPlenum).
 
 ## Stack
@@ -100,6 +103,16 @@ Para executar a mesma sequência consolidada do CI:
 ```bash
 bin/ci
 ```
+
+## Contribuindo
+
+Contribuições são bem-vindas. Antes de começar, consulte o
+[guia de contribuição](CONTRIBUTING.md), o [Código de Conduta](CODE_OF_CONDUCT.md)
+e a [Política de Segurança](SECURITY.md). Dúvidas e propostas iniciais podem ser
+levadas às [discussões do projeto](https://github.com/Araendy-Aratyba/tesa/discussions).
+
+Toda mudança deve ser enviada por pull request. A branch `main` exige os checks
+do CI e não aceita commits diretos.
 
 ## Licença
 
