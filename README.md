@@ -1,3 +1,9 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/branding/diafania-claritas-logo-inverse.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/branding/diafania-claritas-logo.svg">
+  <img alt="Diafania Claritas: o Congresso Nacional observado por um olho" src="assets/branding/diafania-claritas-logo.svg" width="560">
+</picture>
+
 # Tesa
 
 [![CI](https://github.com/Araendy-Aratyba/tesa/actions/workflows/ci.yml/badge.svg)](https://github.com/Araendy-Aratyba/tesa/actions/workflows/ci.yml)

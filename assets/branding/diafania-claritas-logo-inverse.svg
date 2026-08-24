@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 820" role="img" aria-labelledby="title description">
+  <title id="title">Diafania Claritas</title>
+  <desc id="description">Versão clara do croqui do Congresso Nacional observado por um olho.</desc>
+  <g fill="none" stroke="#f7f4ed" stroke-linecap="round" stroke-linejoin="round" stroke-width="11">
+    <path d="M245 604 C430 600 604 596 720 596 C930 596 1160 601 1425 606"/>
+    <path d="M414 594 C456 494 616 478 718 590"/>
+    <path d="M720 592 L720 232 L790 218 L790 596"/>
+    <path d="M828 596 L828 232 L910 250 L910 596"/>
+    <path d="M940 515 C1068 520 1224 519 1356 510"/>
+    <path d="M940 515 C1042 633 1244 644 1356 510"/>
+  </g>
+  <g fill="none" stroke="#f7f4ed" stroke-linecap="round" stroke-linejoin="round" stroke-width="10">
+    <path d="M1138 292 Q1201 210 1298 260"/>
+    <path d="M1138 292 Q1210 351 1298 260"/>
+    <path d="M1172 279 A48 48 0 0 1 1247 270"/>
+    <path d="M1172 279 A48 48 0 0 0 1247 270"/>
+    <circle cx="1192" cy="294" r="18" fill="#f7f4ed" stroke="none"/>
+    <path d="M1149 246 L1134 222 M1175 225 L1166 196 M1205 216 L1202 184 M1236 219 L1243 188 M1265 231 L1280 203 M1288 248 L1310 228"/>
+    <path d="M1144 315 L1129 338 M1170 333 L1161 360 M1200 340 L1199 370 M1231 336 L1238 365 M1260 324 L1276 350 M1283 306 L1306 325"/>
+  </g>
+</svg>
