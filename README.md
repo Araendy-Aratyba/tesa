@@ -42,6 +42,48 @@ bin/dev
 
 A aplicação estará disponível em <http://localhost:3000>.
 
+## Desenvolvimento com Docker Compose
+
+O Compose inicia a aplicação com `Dockerfile.dev`, PostgreSQL e Redis. Construa a imagem e suba os serviços:
+
+```bash
+docker compose build app
+docker compose up
+```
+
+A aplicação estará disponível em <http://localhost:3000>. PostgreSQL e Redis também são publicados no host, respectivamente nas portas `5432` e `6379`, mas apenas na interface local. Para alterar as portas sem editar o arquivo:
+
+```bash
+APP_PORT=3001 POSTGRES_PORT=5433 REDIS_PORT=6380 docker compose up
+```
+
+Execute comandos Rails e a suíte de testes em containers descartáveis:
+
+```bash
+docker compose run --rm app bin/rails console
+docker compose run --rm -e RAILS_ENV=test app bin/rspec
+```
+
+Encerre os serviços mantendo os dados persistidos:
+
+```bash
+docker compose down
+```
+
+Os volumes nomeados preservam gems, módulos JavaScript, PostgreSQL e Redis. `docker compose down --volumes` também remove esses dados.
+
+O Compose disponibiliza `REDIS_URL=redis://redis:6379/0` para integrações que precisem de Redis. Os adaptadores padrão do Rails 8 continuam usando Solid Cache, Solid Queue e Solid Cable.
+
+## Imagem de produção
+
+O `Dockerfile` da raiz gera uma imagem multi-stage, pré-compila os assets e executa a aplicação como usuário sem privilégios:
+
+```bash
+docker build --file Dockerfile --tag tesa:production .
+```
+
+Em produção, forneça as credenciais do Rails e as URLs dos bancos fora da imagem, por variáveis de ambiente ou pelo gerenciador de segredos da plataforma de deploy.
+
 ## Qualidade e testes
 
 ```bash
