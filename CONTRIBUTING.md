@@ -10,9 +10,11 @@ nunca por uma issue pública.
 
 ## Antes de começar
 
-- Pesquise as [issues existentes](https://github.com/Araendy-Aratyba/tesa/issues).
-- Para mudanças grandes, abra primeiro uma issue ou discussão explicando o
-  problema, a proposta e suas alternativas.
+- Pesquise as [issues existentes](https://github.com/Araendy-Aratyba/tesa/issues)
+  e identifique a issue correspondente à mudança. Se ela não existir, abra uma
+  issue antes de criar a branch.
+- Para mudanças grandes, use também uma discussão para explicar o problema, a
+  proposta e suas alternativas.
 - Mantenha cada pull request pequeno e focado em uma única mudança.
 - Nunca inclua credenciais, dados pessoais ou informações legislativas não
   públicas em código, testes, logs ou screenshots.
@@ -31,7 +33,10 @@ rbenv install -s 3.4.6
 rbenv local 3.4.6
 bin/setup --skip-server
 pnpm install --frozen-lockfile
-git switch -c fix/descricao-curta
+gh issue develop 123 \
+  --name bugfix/issue-123/descricao-curta \
+  --base main \
+  --checkout
 ```
 
 Também é possível preparar todo o ambiente com Docker:
@@ -83,8 +88,30 @@ docker compose run --rm -e RAILS_ENV=test app bin/rspec
 
 ## Commits e branches
 
-Use nomes de branch curtos e descritivos, como `feat/filtros-de-votacao`,
-`fix/erro-de-paginacao` ou `docs/instalacao`.
+Toda branch de trabalho deve seguir o formato
+`tipo/issue-N/nome-da-branch`. Os únicos tipos permitidos são:
+
+- `docs` para documentação, guias e políticas;
+- `feature` para novas funcionalidades ou capacidades;
+- `chore` para manutenção, dependências, ferramentas ou infraestrutura;
+- `bugfix` para correções de comportamento.
+
+Use o número da issue no segundo segmento e escreva o nome final em kebab-case,
+com letras minúsculas, números e hífens. Não use abreviações ou prefixos
+alternativos como `feat`, `fix` ou `codex`.
+
+Exemplos:
+
+```text
+feature/issue-7/congrega-plenum-config
+bugfix/issue-123/pagination-cursor
+docs/issue-42/local-setup
+chore/issue-55/update-actions
+```
+
+Prefira `gh issue develop` para criar a branch a partir de `main` e vinculá-la à
+issue no GitHub. Mantenha cada branch focada em uma única issue e não a reutilize
+para outro objetivo.
 
 Escreva mensagens de commit curtas, em inglês, no modo imperativo. Exemplos:
 
@@ -102,7 +129,8 @@ request e pelos checks obrigatórios do CI.
 Um pull request deve:
 
 - explicar o problema, a solução e as decisões relevantes;
-- relacionar a issue correspondente, quando existir;
+- relacionar a issue correspondente com `Closes #N` quando a resolver ou
+  `Relates to #N` quando apenas se relacionar com ela;
 - incluir testes e documentação proporcionais à mudança;
 - incluir screenshots ou vídeos para mudanças visuais;
 - passar em todos os checks obrigatórios;
