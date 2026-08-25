@@ -51,6 +51,38 @@ bin/dev
 
 A aplicação estará disponível em <http://localhost:3000>.
 
+## Integração com a Câmara
+
+O Tesa mantém a URL oficial da API de Dados Abertos configurada pela
+CongregaPlenum. Apenas os parâmetros operacionais podem ser ajustados por
+variáveis de ambiente:
+
+| Variável | Padrão | Finalidade |
+| --- | ---: | --- |
+| `CAMARA_API_TIMEOUT` | `30` | timeout de abertura e leitura, em segundos |
+| `CAMARA_API_RETRIES` | `3` | novas tentativas para falhas transitórias |
+| `CAMARA_API_RETRY_DELAY` | `1.0` | espera inicial entre tentativas, em segundos |
+| `CAMARA_API_RATE_LIMIT_DELAY` | `0.1` | intervalo entre páginas, em segundos |
+
+A aplicação interpreta horários locais no fuso de Brasília e persiste instantes
+em UTC. A API é pública e não exige token ou outra credencial.
+
+Para diagnosticar manualmente a versão instalada e buscar uma única votação na
+API oficial, execute o smoke test abaixo. Este comando usa a rede de propósito e
+não faz parte da suíte automatizada:
+
+```bash
+bin/rails runner '
+  puts "CongregaPlenum #{CongregaPlenum::VERSION}"
+  voting = CongregaPlenum::VotingsService.fetch_list(items_per_page: 1).first
+  abort "Nenhuma votação retornada pela API oficial" unless voting
+  puts "Votação #{voting.fetch("id")}"
+'
+```
+
+O identificador exibido deve ser tratado como string e pode ser alfanumérico,
+por exemplo `2355754-35`; ele não deve ser convertido para número.
+
 ## Desenvolvimento com Docker Compose
 
 O Compose inicia a aplicação com `Dockerfile.dev`, PostgreSQL e Redis. Construa a imagem e suba os serviços:
