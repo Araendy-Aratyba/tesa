@@ -44,6 +44,54 @@ model ou uma renderização direta não precisa ganhar uma classe nova.
 10. Use os comandos e versões fixados no repositório; antes de entregar, execute
     as verificações focadas e, quando viável, `bin/ci`.
 
+## Política obrigatória de branches
+
+Toda branch de trabalho deve identificar o tipo da alteração, a issue e um nome
+curto no formato:
+
+```text
+tipo/issue-N/nome-da-branch
+```
+
+O primeiro segmento deve corresponder à principal alteração da branch e aceita
+somente estas categorias:
+
+| Tipo | Uso |
+| --- | --- |
+| `docs` | documentação, guias e políticas sem mudança de comportamento |
+| `feature` | nova funcionalidade ou capacidade |
+| `chore` | manutenção, dependências, ferramentas ou infraestrutura |
+| `bugfix` | correção de comportamento incorreto |
+
+Regras:
+
+- Substitua `N` pelo número da issue correspondente; não crie branch de trabalho
+  sem issue.
+- Use somente letras minúsculas, números e hífens no nome final.
+- Não use abreviações ou prefixos alternativos como `feat`, `fix` ou `codex`.
+- Mantenha uma branch focada em uma única issue e não a reutilize para outro
+  objetivo.
+- No GitHub, prefira criar e vincular a branch pela própria issue:
+
+  ```bash
+  gh issue develop 7 \
+    --name feature/issue-7/congrega-plenum-config \
+    --base main \
+    --checkout
+  ```
+
+- O pull request deve apontar para `main` e usar `Closes #N` quando resolver a
+  issue ou `Relates to #N` quando apenas se relacionar com ela.
+
+Exemplos válidos:
+
+```text
+feature/issue-7/congrega-plenum-config
+bugfix/issue-123/pagination-cursor
+docs/issue-42/local-setup
+chore/issue-55/update-actions
+```
+
 ## Arquitetura modular
 
 ### Módulos proprietários
