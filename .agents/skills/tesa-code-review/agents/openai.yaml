@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tesa Code Review"
+  short_description: "Revisão Rails conforme a arquitetura do Tesa"
+  default_prompt: "Use $tesa-code-review para revisar estas mudanças do Tesa."
