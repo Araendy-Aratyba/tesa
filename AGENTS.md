@@ -518,57 +518,167 @@ vazia.
 - Falha parcial não apaga dados confirmados nem aparece como sucesso.
 - Migrations e backfills devem ter estratégia de aplicação, retomada e rollback.
 
-## Testes por componente
+## Política obrigatória de testes
 
-### Models
+Esta seção é normativa. As regras abaixo são um **MUST** para código novo e para
+testes alterados.
 
-- validações e invariantes;
-- associações e FKs;
-- índices únicos verificados por comportamento concorrente quando relevante;
-- scopes locais.
+### Princípio: teste comportamento real da aplicação
 
-### Services
+O padrão é exercitar componentes internos reais e observar resultado, estado
+persistido ou resposta. Não substitua colaboração interna por mock para fazer o
+teste passar.
 
-- caminho de sucesso, falha e reexecução;
-- fronteira transacional;
-- idempotência;
-- Result retornado;
-- integração externa substituída por double verificável;
-- falha externa não convertida em sucesso vazio.
+- Models, Services, Query Objects, Presenters, Jobs e `PublicApi` internos devem
+  ser reais no teste.
+- Use o PostgreSQL de teste e as transações do RSpec para comportamentos que
+  dependam de persistência.
+- Prefira expectativas de estado e saída, como registros criados, atributos
+  alterados, coleções retornadas e respostas HTTP.
+- Não use expectativa de mensagem para provar uma regra que pode ser verificada
+  pelo efeito observável.
+- Não force estados internos inalcançáveis com mocks. Modele o estado com uma
+  factory e, quando ele for reutilizável ou tiver significado de domínio, com
+  uma trait.
 
-### Query Objects
+São proibidos para colaboradores internos:
 
-- filtros isolados e combinados;
-- ordenação determinística;
-- paginação/agregações;
-- ausência de escrita;
-- quantidade de queries/N+1 quando relevante.
+- `allow`, `stub`, `double`, `instance_double`, `class_double`, `spy` e
+  expectativas `receive`;
+- `allow_any_instance_of` e `expect_any_instance_of`, inclusive para fronteiras
+  externas;
+- mock ou stub de Models Active Record, relações, associações, validações ou
+  callbacks;
+- mock ou stub de Services, Query Objects, Presenters, Jobs ou `PublicApi` da
+  própria aplicação;
+- `OpenStruct`, hashes ou doubles usados no lugar de um objeto de domínio que
+  deveria estar persistido.
 
-### Presenters
+### Única exceção: fronteiras externas
 
-- não acessar banco;
-- formatação e I18n;
-- estados `true`, `false`, `nil` e vazio;
-- caracteres e textos vindos da fonte tratados com segurança.
+Mocks, stubs, doubles e `allow` só são aceitos no ponto exato em que a aplicação
+atravessa uma fronteira externa. Exemplos:
 
-### Jobs
+- clientes e chamadas da gem `congrega_plenum`;
+- HTTP para APIs de terceiros;
+- serviços externos de armazenamento, e-mail, filas ou observabilidade;
+- sistema de arquivos ou processos externos, quando forem uma integração da
+  aplicação e não o objeto sob teste.
 
-- fila, argumentos e enqueue;
-- delegação ao Service;
-- retry apenas para erro transitório;
-- falha terminal;
-- controle de concorrência e próxima unidade.
+Substitua apenas o cliente ou adapter de fronteira. O Service, Mapper, Model,
+Query Object, Presenter e Job que consomem essa resposta continuam reais. O
+stub deve devolver um payload contratual pequeno e representativo, incluindo
+falhas e respostas inesperadas quando aplicável.
 
-### Requests e sistema
+Exemplo permitido, porque intercepta a fronteira com a fonte externa:
 
-- autorização;
-- wiring de Query Object/Service;
-- respostas e redirects;
-- estados visuais e acessibilidade;
-- sem chamadas externas reais.
+```ruby
+allow(CongregaPlenum::VotingsService)
+  .to receive(:fetch_list)
+  .with(year: 2026, page: 1)
+  .and_return(contract_payload)
+```
 
-Use factories e fixtures contratuais pequenas. Smoke tests reais contra a Câmara
-são opt-in, controlados e não pertencem ao CI padrão.
+Exemplos proibidos, porque substituem comportamento interno:
+
+```ruby
+allow(Camara::Legislation::Voting).to receive(:upsert_all)
+allow(Camara::Legislation::ImportVotingsPage).to receive(:call)
+allow(Camara::Legislation::PublicApi).to receive(:find_voting)
+```
+
+Se um `allow` não estiver obviamente apontado para uma fronteira externa, o
+teste deve ser reescrito. A conveniência, a velocidade ou a dificuldade de
+preparar dados não justificam mockar código interno.
+
+Testes reais contra a rede são smoke tests opt-in, controlados e não pertencem
+ao CI padrão. O CI deve ser determinístico e nunca depender da disponibilidade
+da Câmara ou de outro fornecedor.
+
+### FactoryBot e estado persistido
+
+Ao preparar dados de domínio, **sempre** use objetos reais persistidos no banco
+e criados com FactoryBot. Esta regra é obrigatória; para registros de domínio,
+esta é a forma padrão de preparar cenários:
+
+```ruby
+let!(:voting) do
+  create(:camara_legislation_voting, :approved, external_id: "VOT-2026-1")
+end
+```
+
+- Use `create`, `create_list` e associações de factories para dados que
+  participam do comportamento testado.
+- Não use `Model.create!` diretamente em specs comuns. Centralize a construção
+  válida nas factories.
+- Não use `build_stubbed` quando validações, callbacks, relações, consultas,
+  constraints ou identidade persistida fizerem parte do comportamento.
+- Factories devem criar o menor objeto válido e não esconder grande quantidade
+  de dados ou efeitos laterais irrelevantes.
+- Informe no exemplo apenas os atributos centrais ao cenário; defaults válidos
+  e detalhes incidentais pertencem à factory.
+- Use sequences para identidades que precisam ser únicas.
+- Não desative validações ou callbacks para facilitar a preparação do teste.
+
+Crie traits para variações reutilizáveis e semanticamente relevantes, por
+exemplo `:approved`, `:rejected`, `:approval_unknown`, `:nominal`, `:symbolic` ou
+`:with_votes`. Prefira compor traits a criar várias factories quase idênticas.
+A trait deve representar um estado válido e manter explícitas as diferenças
+importantes para a regra testada.
+
+Payloads em hash ou fixtures pequenas são apropriados para testar Mappers puros
+e contratos de fronteira, pois nesses casos o payload externo, e não um registro
+de domínio, é o objeto sob teste.
+
+### Cobertura por componente
+
+#### Models
+
+- use registros FactoryBot reais;
+- cubra validações, invariantes, associações, FKs e scopes locais;
+- verifique índices únicos por persistência e comportamento concorrente quando
+  relevante;
+- não faça stub de validações, callbacks, relações ou métodos de persistência.
+
+#### Services
+
+- use Models, outros componentes internos e banco reais;
+- cubra sucesso, falha, reexecução, fronteira transacional e idempotência;
+- verifique o `Result` e os efeitos persistidos;
+- substitua somente a fronteira externa por stub ou double verificável;
+- confirme que falha externa não vira coleção vazia ou falso sucesso.
+
+#### Query Objects
+
+- prepare registros persistidos com FactoryBot;
+- cubra filtros isolados e combinados, ordenação, paginação e agregações;
+- compare os registros reais retornados e confirme ausência de escrita;
+- meça quantidade de queries e N+1 quando relevante;
+- não faça stub de relations, scopes ou Models.
+
+#### Presenters
+
+- use objetos reais criados por FactoryBot quando houver Model de domínio;
+- cubra formatação, I18n e estados `true`, `false`, `nil` e vazio;
+- use contexto/helper de view real quando o comportamento depender dele;
+- confirme que o Presenter não consulta banco;
+- não substitua Model ou helper interno por double apenas por conveniência.
+
+#### Jobs
+
+- use o adapter de teste do Active Job e execute o Job real;
+- prepare registros com FactoryBot e verifique estado persistido e Jobs
+  enfileirados;
+- cubra fila, argumentos, retry transitório, falha terminal e concorrência;
+- não faça mock do Service interno chamado pelo Job; substitua somente a
+  fronteira externa alcançada durante a execução.
+
+#### Requests e sistema
+
+- percorra a pilha real de rota, controller, Service/Query Object e resposta;
+- prepare autenticação e dados de domínio com FactoryBot;
+- cubra autorização, respostas, redirects, estados visuais e acessibilidade;
+- não faça chamadas externas reais: intercepte apenas a fronteira externa.
 
 ## Critério para escolher o padrão
 
@@ -623,6 +733,12 @@ Antes de concluir uma implementação, confirme:
 - [ ] A operação é idempotente e possui índices apropriados.
 - [ ] Limitações semânticas da Câmara estão preservadas.
 - [ ] Testes focados cobrem sucesso, falha e casos desconhecidos.
+- [ ] Os testes usam objetos internos reais e não mockam componentes da
+      aplicação.
+- [ ] Registros de domínio são criados com FactoryBot e traits representam os
+      estados reutilizáveis.
+- [ ] Mocks, stubs e `allow`, se presentes, interceptam somente fronteiras
+      externas.
 - [ ] `bin/ci` foi executado ou a limitação foi registrada no PR.
 - [ ] Documentação, exemplos, variáveis, migrations e runbooks foram atualizados.
 - [ ] O PR explica risco, observabilidade e rollback.
