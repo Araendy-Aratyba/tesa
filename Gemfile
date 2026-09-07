@@ -71,5 +71,5 @@ end
 group :test do
   # Browser-backed RSpec system specs for Hotwire interactions
   gem "capybara", "~> 3.40"
-  gem "selenium-webdriver", "~> 4.47"
+  gem "selenium-webdriver", "~> 4.48"
 end
