@@ -9,8 +9,14 @@ class Camara::Ingestion::SyncRun < ApplicationRecord
   MAX_ERROR_CLASS_LENGTH = 255
   MAX_ERROR_MESSAGE_LENGTH = 1_000
   UNSET_PROGRESS_VALUE = Object.new.freeze
-  SENSITIVE_PARAMETER_PATTERN = /\b(password|secret|token|access[_-]?token|api[_-]?key)\b(\s*[:=]\s*)([^\s&,;]+)/i
-  AUTHORIZATION_PATTERN = /\b(authorization\b\s*[:=]\s*)(?:bearer\s+)?([^\s&,;]+)/i
+  SENSITIVE_PARAMETER_PATTERN = %r~
+    (?<prefix>\b(?:password|secret|token|access[_-]?token|api[_-]?key)\b["']?\s*(?::|=>|=)\s*)
+    (?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[^\s&,;}]+)
+  ~ix
+  AUTHORIZATION_PATTERN = %r~
+    (?<prefix>\bauthorization\b["']?\s*(?::|=>|=)\s*)
+    (?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|(?:bearer\s+)?[^\s&,;}]+)
+  ~ix
   BEARER_PATTERN = /\bbearer\s+([^\s&,;]+)/i
 
   class InvalidTransition < StandardError; end
@@ -117,8 +123,8 @@ class Camara::Ingestion::SyncRun < ApplicationRecord
 
   def sanitized_error_message(error)
     message = error.message.to_s.presence || sanitized_error_class(error)
-    message = message.gsub(AUTHORIZATION_PATTERN, '\\1[FILTERED]')
-    message = message.gsub(SENSITIVE_PARAMETER_PATTERN, '\\1\\2[FILTERED]')
+    message = message.gsub(AUTHORIZATION_PATTERN, '\\k<prefix>[FILTERED]')
+    message = message.gsub(SENSITIVE_PARAMETER_PATTERN, '\\k<prefix>[FILTERED]')
     message.gsub(BEARER_PATTERN, "Bearer [FILTERED]").first(MAX_ERROR_MESSAGE_LENGTH)
   end
 

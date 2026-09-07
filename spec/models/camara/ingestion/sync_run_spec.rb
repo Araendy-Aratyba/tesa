@@ -171,6 +171,23 @@ RSpec.describe Camara::Ingestion::SyncRun, type: :model do
       expect(sync_run.attributes).not_to have_key("backtrace")
     end
 
+    it "sanitizes credentials in serialized diagnostics before persisting them" do
+      sync_run = create(:camara_ingestion_sync_run, :running)
+      error = RuntimeError.new(
+        'payload={"token":"json-secret","access_token":"access-secret",' \
+          '"api_key":"sk-live","password":"password-secret","secret":"generic-secret"} ' \
+          'params={:password=>"ruby-secret"} headers={"Authorization":"Bearer header-secret"}'
+      )
+
+      sync_run.fail!(error:)
+
+      expect(sync_run.reload.error_message).to eq(
+        'payload={"token":[FILTERED],"access_token":[FILTERED],"api_key":[FILTERED],' \
+          '"password":[FILTERED],"secret":[FILTERED]} ' \
+          'params={:password=>[FILTERED]} headers={"Authorization":[FILTERED]}'
+      )
+    end
+
     it "rejects transitions from an incompatible state" do
       pending_sync_run = create(:camara_ingestion_sync_run)
       running_sync_run = create(:camara_ingestion_sync_run, :running)
