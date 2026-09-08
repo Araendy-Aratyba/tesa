@@ -83,6 +83,9 @@ bin/rails runner '
 O identificador exibido deve ser tratado como string e pode ser alfanumérico,
 por exemplo `2355754-35`; ele não deve ser convertido para número.
 
+O contrato de persistência, os campos normalizados e a política de datas de
+`Camara::Legislation::Voting` estão em [Persistência de votações](docs/camara/votings.md).
+
 ## Desenvolvimento com Docker Compose
 
 O Compose inicia a aplicação com `Dockerfile.dev`, PostgreSQL e Redis. Construa a imagem e suba os serviços:

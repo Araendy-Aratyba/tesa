@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_25_010940) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_07_235500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -36,5 +36,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_010940) do
     t.check_constraint "page IS NULL OR page > 0", name: "camara_sync_runs_page_positive_check"
     t.check_constraint "processed_count >= 0", name: "camara_sync_runs_processed_count_nonnegative_check"
     t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'running'::character varying, 'succeeded'::character varying, 'failed'::character varying]::text[])", name: "camara_sync_runs_status_check"
+  end
+
+  create_table "camara_votings", force: :cascade do |t|
+    t.boolean "approved"
+    t.string "body_acronym"
+    t.string "body_external_id"
+    t.string "body_source_uri"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "event_external_id"
+    t.string "event_source_uri"
+    t.string "external_id", null: false
+    t.datetime "fetched_at", null: false
+    t.date "occurred_on", null: false
+    t.jsonb "raw_payload", null: false
+    t.datetime "registered_at"
+    t.string "source_uri", null: false
+    t.datetime "updated_at", null: false
+    t.index ["body_external_id"], name: "index_camara_votings_on_body_external_id"
+    t.index ["event_external_id"], name: "index_camara_votings_on_event_external_id"
+    t.index ["external_id"], name: "index_camara_votings_on_external_id", unique: true
+    t.index ["occurred_on"], name: "index_camara_votings_on_occurred_on"
+    t.check_constraint "btrim(external_id::text) <> ''::text", name: "camara_votings_external_id_present"
+    t.check_constraint "jsonb_typeof(raw_payload) = 'object'::text", name: "camara_votings_payload_object"
   end
 end
