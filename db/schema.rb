@@ -10,9 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_07_235500) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_08_003000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "camara_orientations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "fetched_at", null: false
+    t.string "group_acronym"
+    t.string "group_external_id"
+    t.string "group_key", null: false
+    t.string "group_source_uri"
+    t.string "leadership_type"
+    t.string "position"
+    t.jsonb "raw_payload", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "voting_id", null: false
+    t.index ["group_key"], name: "index_camara_orientations_on_group_key"
+    t.index ["position"], name: "index_camara_orientations_on_position"
+    t.index ["voting_id", "group_key"], name: "index_camara_orientations_identity", unique: true
+    t.check_constraint "btrim(group_key::text) <> ''::text", name: "camara_orientations_group_key_present"
+    t.check_constraint "jsonb_typeof(raw_payload) = 'object'::text", name: "camara_orientations_payload_object"
+  end
 
   create_table "camara_sync_runs", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -35,7 +54,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_235500) do
     t.check_constraint "jsonb_typeof(filters) = 'object'::text", name: "camara_sync_runs_filters_object_check"
     t.check_constraint "page IS NULL OR page > 0", name: "camara_sync_runs_page_positive_check"
     t.check_constraint "processed_count >= 0", name: "camara_sync_runs_processed_count_nonnegative_check"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'running'::character varying, 'succeeded'::character varying, 'failed'::character varying]::text[])", name: "camara_sync_runs_status_check"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'running'::character varying::text, 'succeeded'::character varying::text, 'failed'::character varying::text])", name: "camara_sync_runs_status_check"
+  end
+
+  create_table "camara_votes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "deputy_email"
+    t.string "deputy_external_id", null: false
+    t.string "deputy_name"
+    t.string "deputy_photo_url"
+    t.string "deputy_source_uri"
+    t.datetime "fetched_at", null: false
+    t.string "legislature_external_id"
+    t.string "party_acronym"
+    t.string "party_source_uri"
+    t.string "position"
+    t.jsonb "raw_payload", null: false
+    t.datetime "recorded_at"
+    t.string "state_acronym"
+    t.datetime "updated_at", null: false
+    t.bigint "voting_id", null: false
+    t.index ["deputy_external_id"], name: "index_camara_votes_on_deputy_external_id"
+    t.index ["position"], name: "index_camara_votes_on_position"
+    t.index ["voting_id", "deputy_external_id"], name: "index_camara_votes_identity", unique: true
+    t.check_constraint "btrim(deputy_external_id::text) <> ''::text", name: "camara_votes_deputy_external_id_present"
+    t.check_constraint "jsonb_typeof(raw_payload) = 'object'::text", name: "camara_votes_payload_object"
   end
 
   create_table "camara_votings", force: :cascade do |t|
@@ -61,4 +104,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_235500) do
     t.check_constraint "btrim(external_id::text) <> ''::text", name: "camara_votings_external_id_present"
     t.check_constraint "jsonb_typeof(raw_payload) = 'object'::text", name: "camara_votings_payload_object"
   end
+
+  add_foreign_key "camara_orientations", "camara_votings", column: "voting_id"
+  add_foreign_key "camara_votes", "camara_votings", column: "voting_id"
 end

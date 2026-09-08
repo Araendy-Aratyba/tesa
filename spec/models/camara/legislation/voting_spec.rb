@@ -3,6 +3,37 @@
 require "rails_helper"
 
 RSpec.describe Camara::Legislation::Voting, type: :model do
+  it "owns independent vote and orientation collections without synthesizing absences" do
+    voting = create(:camara_legislation_voting)
+
+    expect(voting.votes).to be_empty
+    expect(voting.orientations).to be_empty
+
+    vote = create(:camara_legislation_vote, voting:)
+    orientation = create(:camara_legislation_orientation, voting:)
+
+    expect(voting.reload.votes).to contain_exactly(vote)
+    expect(voting.orientations).to contain_exactly(orientation)
+  end
+
+  it "deletes child records only when the voting is explicitly destroyed" do
+    voting = create(:camara_legislation_voting)
+    vote = create(:camara_legislation_vote, voting:)
+    orientation = create(:camara_legislation_orientation, voting:)
+
+    expect do
+      described_class.transaction(requires_new: true) do
+        described_class.connection.delete("DELETE FROM camara_votings WHERE id = #{Integer(voting.id)}")
+      end
+    end.to raise_error(ActiveRecord::InvalidForeignKey)
+    expect(voting.reload).to be_present
+
+    voting.destroy!
+
+    expect(Camara::Legislation::Vote.where(id: vote.id)).not_to exist
+    expect(Camara::Legislation::Orientation.where(id: orientation.id)).not_to exist
+  end
+
   it "loads the namespaced model and preserves its external identity and provenance" do
     payload = {
       "id" => "2355754-35", "data" => "2026-01-15", "aprovacao" => nil,

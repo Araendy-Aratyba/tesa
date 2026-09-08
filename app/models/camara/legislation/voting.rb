@@ -3,6 +3,15 @@
 class Camara::Legislation::Voting < ApplicationRecord
   self.table_name = "camara_votings"
 
+  has_many :votes,
+    class_name: "Camara::Legislation::Vote",
+    inverse_of: :voting,
+    dependent: :delete_all
+  has_many :orientations,
+    class_name: "Camara::Legislation::Orientation",
+    inverse_of: :voting,
+    dependent: :delete_all
+
   validates :external_id, presence: true, uniqueness: true
   validates :occurred_on, :source_uri, :fetched_at, :raw_payload, presence: true
   validate :raw_payload_is_an_object
