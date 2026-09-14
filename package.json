@@ -6,6 +6,6 @@
     "lint:erb": "herb-lint"
   },
   "devDependencies": {
-    "@herb-tools/linter": "^0.10.3"
+    "@herb-tools/linter": "^0.10.4"
   }
 }

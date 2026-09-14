@@ -9,37 +9,37 @@ importers:
   .:
     devDependencies:
       '@herb-tools/linter':
-        specifier: ^0.10.3
-        version: 0.10.3(tailwindcss@4.3.3)
+        specifier: ^0.10.4
+        version: 0.10.4(tailwindcss@4.3.3)
 
 packages:
 
-  '@herb-tools/config@0.10.3':
-    resolution: {integrity: sha512-cSaOwuWnij1wiB4Xh9Zfx/s+lhis7cN/+PXssanT/mXQLSRU2QeYasivyCQ1tRnpIVdGGOC/rqHVJQeNmj4pqg==}
+  '@herb-tools/config@0.10.4':
+    resolution: {integrity: sha512-3VwB16SbGL88PqI7yfquLoZgRX5nL/HXxBPVPN9K8CCQYGI8jT1QGDM8pm5z6l+KbiRqP8gQX+u5huwkKviilQ==}
 
-  '@herb-tools/core@0.10.3':
-    resolution: {integrity: sha512-rtDoh6C/EMYLEtFwYpuY+IlnV7PLsF5hQszq7uMDE/bwEpLVBlPFd2Wlk9E0RB31PVQKV1MwgGqstte87XqF9g==}
+  '@herb-tools/core@0.10.4':
+    resolution: {integrity: sha512-JcLwVjqW8gfTaCsSRueFU31CtYSjWkKdFVvNA1fPM4D90j/RqY04aa0rlZghjHc0AzNIiJd81Vk8c8WWjfn4Ag==}
 
-  '@herb-tools/highlighter@0.10.3':
-    resolution: {integrity: sha512-vyBPl/oWalPcXrhni6RrQzeizzC0i7An3yMAg/Xx+4HDhgU/zOlRqSUYLU7SpzjfK4OU5QhRDdc3OBI8dT5qmg==}
+  '@herb-tools/highlighter@0.10.4':
+    resolution: {integrity: sha512-UYKr1ufqiho+PvebdDVxrnRz6BA5P/Agd1ybeOFNoBuvAoJvvajJjrzupLinDlXM+w5D3m+CgrVNemKU9BmSCQ==}
     hasBin: true
 
-  '@herb-tools/linter@0.10.3':
-    resolution: {integrity: sha512-uNwJZkzswJ/IcpsjbuEzOXQQcfc40KGy8Ao1L69na2J6H7b4LFig2OIZ22vJasGdv4jODWJWnMDozRvWuv1vFA==}
+  '@herb-tools/linter@0.10.4':
+    resolution: {integrity: sha512-Of63S0S55qcFViEsqXpIPcQ9pIGUPYrQXqyVaPv36Ntj0jFuDn5tUb0hYBZcT7eSkG5Eq7PsP7g6CELba7O25w==}
     hasBin: true
 
-  '@herb-tools/node-wasm@0.10.3':
-    resolution: {integrity: sha512-KUwHUMB6kluyvRiW0A9wbTiuO/qlvXLlSAnewmH2za7yePvYRSiThfAZEmXPqEmpmMRcIksFxaNaxUc6nBqyuA==}
+  '@herb-tools/node-wasm@0.10.4':
+    resolution: {integrity: sha512-HTk4DI0AORYSZeXckASrnTy75JRGeDcOLCJn4oX3YVZIMjkrJtJkUhky5quF1iHHznL9sxb/PW+IJ3YVOR299A==}
 
-  '@herb-tools/printer@0.10.3':
-    resolution: {integrity: sha512-OuuIisERq3TLnms/Wm5N6w/ITYqlBPPLsc1FNHdN3qedPOA/ey1dF2rKewUzQAsAZheRCs5nem7tDYRhPb2D/Q==}
+  '@herb-tools/printer@0.10.4':
+    resolution: {integrity: sha512-UHe8sk/hWTbDk7I1uicHtUo0w4+BNdPcceieAACWSc+SHZFminnbF72hsH4WYbGH5roA2Bx3tuQ+G2fTppK7pA==}
     hasBin: true
 
-  '@herb-tools/rewriter@0.10.3':
-    resolution: {integrity: sha512-UsqWOJVcmB7lptLtjUeFpVvOn44LFae+I44p5ixQ9nDLNnZiN/2+R52tJmVLOWijQORvtMInCWOHrSvXF6Bf/g==}
+  '@herb-tools/rewriter@0.10.4':
+    resolution: {integrity: sha512-RRkH24O2iWMZc3T79xxQeaAnnFv8oVBw2Pwv+qz5iqQfOB259GqZMG2TwCOA8EAhpMWyd9ImVI/pWuZ95AaoEw==}
 
-  '@herb-tools/tailwind-class-sorter@0.10.3':
-    resolution: {integrity: sha512-KAowwSS6NmcRTQrQ591DR6dGI675KB0o/yxZt113BNDWiBB+bl4xdnd3hT19JV6Jsh3sS/0e90hYGUj/6PBW0g==}
+  '@herb-tools/tailwind-class-sorter@0.10.4':
+    resolution: {integrity: sha512-5tWFUwEaUor3SDDI/4GAYemReoA/3m5jQLcJ+g+oMdZhhbguExI+Dh5hUJU6WSdWZ9j/HJ1HhBXC/i8pdSEqQQ==}
     engines: {node: '>=14.21.3'}
     peerDependencies:
       tailwindcss: ^3.0 || ^4.0
@@ -87,8 +87,8 @@ packages:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
 
-  nanoid@3.3.18:
-    resolution: {integrity: sha512-DTg4MJbGMWkfi6VZFdNt2/caMbQy4Ou+Op/hJQvGEWcnVfoA1QA+xzRKAzw9jD6+GVOOeYr/mIcuDSdug6F6+w==}
+  nanoid@3.3.19:
+    resolution: {integrity: sha512-Y2tUNy4ouw6tq5oDSKeQYGOyhkUBhNOcGV/02KC+6kd9eDGqdZd++mjMiIDilrBYvjEnCYvVtsuHCuP+okSfug==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
@@ -102,8 +102,8 @@ packages:
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
-  picomatch@4.0.5:
-    resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
+  picomatch@4.0.7:
+    resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
   postcss-import@16.2.0:
@@ -115,8 +115,8 @@ packages:
   postcss-value-parser@4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
 
-  postcss@8.5.26:
-    resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
+  postcss@8.5.28:
+    resolution: {integrity: sha512-RRuzqDtt5Y9h3quz5hWhK+TPnsmVs6WwSU6LkJMeY4HstUEDuYTG8UJSdawMRzmzAtV+KEoG8N3Qg2qLy5vM/A==}
     engines: {node: ^10 || ^12 || >=14}
 
   read-cache@1.0.2:
@@ -153,62 +153,62 @@ packages:
 
 snapshots:
 
-  '@herb-tools/config@0.10.3':
+  '@herb-tools/config@0.10.4':
     dependencies:
-      '@herb-tools/core': 0.10.3
-      picomatch: 4.0.5
+      '@herb-tools/core': 0.10.4
+      picomatch: 4.0.7
       tinyglobby: 0.2.17
       yaml: 2.9.0
 
-  '@herb-tools/core@0.10.3':
+  '@herb-tools/core@0.10.4':
     dependencies:
       '@ruby/prism': 1.9.0
 
-  '@herb-tools/highlighter@0.10.3':
+  '@herb-tools/highlighter@0.10.4':
     dependencies:
-      '@herb-tools/core': 0.10.3
-      '@herb-tools/node-wasm': 0.10.3
+      '@herb-tools/core': 0.10.4
+      '@herb-tools/node-wasm': 0.10.4
 
-  '@herb-tools/linter@0.10.3(tailwindcss@4.3.3)':
+  '@herb-tools/linter@0.10.4(tailwindcss@4.3.3)':
     dependencies:
-      '@herb-tools/config': 0.10.3
-      '@herb-tools/core': 0.10.3
-      '@herb-tools/highlighter': 0.10.3
-      '@herb-tools/node-wasm': 0.10.3
-      '@herb-tools/printer': 0.10.3
-      '@herb-tools/rewriter': 0.10.3(tailwindcss@4.3.3)
+      '@herb-tools/config': 0.10.4
+      '@herb-tools/core': 0.10.4
+      '@herb-tools/highlighter': 0.10.4
+      '@herb-tools/node-wasm': 0.10.4
+      '@herb-tools/printer': 0.10.4
+      '@herb-tools/rewriter': 0.10.4(tailwindcss@4.3.3)
       '@ruby/prism': 1.9.0
-      picomatch: 4.0.5
+      picomatch: 4.0.7
       tinyglobby: 0.2.17
     transitivePeerDependencies:
       - tailwindcss
 
-  '@herb-tools/node-wasm@0.10.3':
+  '@herb-tools/node-wasm@0.10.4':
     dependencies:
-      '@herb-tools/core': 0.10.3
+      '@herb-tools/core': 0.10.4
       '@ruby/prism': 1.9.0
 
-  '@herb-tools/printer@0.10.3':
+  '@herb-tools/printer@0.10.4':
     dependencies:
-      '@herb-tools/core': 0.10.3
+      '@herb-tools/core': 0.10.4
       tinyglobby: 0.2.17
 
-  '@herb-tools/rewriter@0.10.3(tailwindcss@4.3.3)':
+  '@herb-tools/rewriter@0.10.4(tailwindcss@4.3.3)':
     dependencies:
-      '@herb-tools/core': 0.10.3
-      '@herb-tools/tailwind-class-sorter': 0.10.3(tailwindcss@4.3.3)
+      '@herb-tools/core': 0.10.4
+      '@herb-tools/tailwind-class-sorter': 0.10.4(tailwindcss@4.3.3)
       '@ruby/prism': 1.9.0
       tinyglobby: 0.2.17
     transitivePeerDependencies:
       - tailwindcss
 
-  '@herb-tools/tailwind-class-sorter@0.10.3(tailwindcss@4.3.3)':
+  '@herb-tools/tailwind-class-sorter@0.10.4(tailwindcss@4.3.3)':
     dependencies:
       clear-module: 4.1.3
       escalade: 3.2.0
       jiti: 2.7.0
-      postcss: 8.5.26
-      postcss-import: 16.2.0(postcss@8.5.26)
+      postcss: 8.5.28
+      postcss-import: 16.2.0(postcss@8.5.28)
       tailwindcss: 4.3.3
 
   '@ruby/prism@1.9.0': {}
@@ -224,9 +224,9 @@ snapshots:
 
   escalade@3.2.0: {}
 
-  fdir@6.5.0(picomatch@4.0.5):
+  fdir@6.5.0(picomatch@4.0.7):
     optionalDependencies:
-      picomatch: 4.0.5
+      picomatch: 4.0.7
 
   function-bind@1.1.2: {}
 
@@ -240,7 +240,7 @@ snapshots:
 
   jiti@2.7.0: {}
 
-  nanoid@3.3.18: {}
+  nanoid@3.3.19: {}
 
   parent-module@2.0.0:
     dependencies:
@@ -250,20 +250,20 @@ snapshots:
 
   picocolors@1.1.1: {}
 
-  picomatch@4.0.5: {}
+  picomatch@4.0.7: {}
 
-  postcss-import@16.2.0(postcss@8.5.26):
+  postcss-import@16.2.0(postcss@8.5.28):
     dependencies:
-      postcss: 8.5.26
+      postcss: 8.5.28
       postcss-value-parser: 4.2.0
       read-cache: 1.0.2
       resolve: 1.22.12
 
   postcss-value-parser@4.2.0: {}
 
-  postcss@8.5.26:
+  postcss@8.5.28:
     dependencies:
-      nanoid: 3.3.18
+      nanoid: 3.3.19
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -286,7 +286,7 @@ snapshots:
 
   tinyglobby@0.2.17:
     dependencies:
-      fdir: 6.5.0(picomatch@4.0.5)
-      picomatch: 4.0.5
+      fdir: 6.5.0(picomatch@4.0.7)
+      picomatch: 4.0.7
 
   yaml@2.9.0: {}
