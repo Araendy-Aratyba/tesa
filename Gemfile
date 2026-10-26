@@ -65,7 +65,7 @@ group :development do
   gem "web-console"
 
   # HTML-aware ERB parser used by the Herb development toolchain
-  gem "herb", "~> 0.10.3", require: false
+  gem "herb", "~> 0.11.1", require: false
 end
 
 group :test do
