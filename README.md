@@ -13,8 +13,8 @@ Aplicação Rails para trabalhar com dados legislativos da Câmara dos Deputados
 
 ## Stack
 
-- Ruby 3.4.6, gerenciado com rbenv
-- Rails 8.1.3.1
+- Ruby 3.4.13, gerenciado com rbenv
+- Rails 8.1.4.1
 - PostgreSQL
 - Hotwire: Turbo e Stimulus com Importmap
 - Tailwind CSS 4
@@ -27,8 +27,8 @@ Aplicação Rails para trabalhar com dados legislativos da Câmara dos Deputados
 Instale e selecione o Ruby:
 
 ```bash
-rbenv install -s 3.4.6
-rbenv local 3.4.6
+rbenv install -s 3.4.13
+rbenv local 3.4.13
 gem install bundler
 ```
 
@@ -39,7 +39,7 @@ bin/setup --skip-server
 pnpm install --frozen-lockfile
 ```
 
-O Dev Container inclui Ruby 3.4.6, Node.js, pnpm e um serviço PostgreSQL. Ao abri-lo, o comando de preparação é executado automaticamente.
+O Dev Container inclui Ruby 3.4.13, Node.js, pnpm e um serviço PostgreSQL. Ao abri-lo, o comando de preparação é executado automaticamente.
 
 ## Desenvolvimento
 
