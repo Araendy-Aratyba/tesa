@@ -3,13 +3,14 @@
 require "rails_helper"
 require "prism"
 
-RSpec.describe "Camara Ingestion and Legislation boundaries" do
+RSpec.describe "Camara module boundaries" do
   it "keeps qualified model references within their owning module" do
-    modules = %w[ingestion legislation]
+    modules = %w[ingestion legislation representatives]
     violations = modules.flat_map do |owner|
-      other = (modules - [ owner ]).sole
-      models = Rails.root.glob("app/models/camara/#{other}/**/*.rb").map do |path|
-        path.relative_path_from(Rails.root.join("app/models/camara")).to_s.delete_suffix(".rb").camelize
+      models = (modules - [ owner ]).flat_map do |other|
+        Rails.root.glob("app/models/camara/#{other}/**/*.rb").map do |path|
+          path.relative_path_from(Rails.root.join("app/models/camara")).to_s.delete_suffix(".rb").camelize
+        end
       end
 
       Rails.root.glob("app/{jobs,services}/camara/#{owner}/**/*.rb").filter_map do |path|

@@ -1,0 +1,4 @@
+[
+  {"id": 1, "uri": "https://dadosabertos.camara.leg.br/api/v2/legislaturas/1", "dataInicio": "1826-04-29", "dataFim": "1830-04-24"},
+  {"id": 57, "uri": "https://dadosabertos.camara.leg.br/api/v2/legislaturas/57", "dataInicio": "2023-02-01", "dataFim": "2027-01-31"}
+]

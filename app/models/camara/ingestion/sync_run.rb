@@ -7,7 +7,8 @@ class Camara::Ingestion::SyncRun < ApplicationRecord
     class_name: "Camara::Ingestion::VotingHydrationFailure", inverse_of: :sync_run
 
   FILTER_SCHEMAS = {
-    "votings" => %w[start_date end_date]
+    "votings" => %w[start_date end_date],
+    "legislatures" => %w[mode]
   }.freeze
   MAX_ERROR_CLASS_LENGTH = 255
   MAX_ERROR_MESSAGE_LENGTH = 1_000
@@ -104,6 +105,30 @@ class Camara::Ingestion::SyncRun < ApplicationRecord
     end
 
     self
+  end
+
+  def confirm_catalog_page!(page:, record_count:, complete:)
+    with_lock do
+      checkpoint = self.page.to_i
+      next unless running? && page > checkpoint
+
+      raise InvalidProgress, "cannot skip a catalogue page" unless page == checkpoint + 1
+
+      progress = { page:, processed_count: processed_count + record_count }
+      if complete
+        now = Time.current
+        progress.merge!(status: :succeeded, finished_at: now, pagination_completed_at: now)
+      end
+      update!(progress)
+    end
+  end
+
+  def complete_catalog_detail!(record_count:)
+    with_lock do
+      next unless running?
+
+      update!(status: :succeeded, finished_at: Time.current, processed_count: record_count)
+    end
   end
 
   def acknowledge_voting_page!(page:)

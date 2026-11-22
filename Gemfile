@@ -20,7 +20,7 @@ gem "tailwindcss-rails"
 gem "jbuilder"
 
 # Câmara dos Deputados open data API client
-gem "congrega_plenum", "~> 0.2.0"
+gem "congrega_plenum", "~> 0.3.0"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
