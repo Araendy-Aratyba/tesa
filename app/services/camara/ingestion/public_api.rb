@@ -43,7 +43,11 @@ module Camara::Ingestion::PublicApi
   end
 
   def self.fail_running!(sync_run_id:, error:)
-    Camara::Ingestion::SyncRun.find_by(id: sync_run_id)&.fail!(error:, only_if_running: true)
+    sync_run = Camara::Ingestion::SyncRun.find_by(id: sync_run_id)
+    return unless sync_run
+
+    sync_run.fail!(error:, only_if_running: true)
+    snapshot(sync_run)
   end
 
   def self.succeed!(sync_run_id:)
