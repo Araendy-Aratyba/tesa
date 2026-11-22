@@ -42,6 +42,14 @@ module Camara::Ingestion::PublicApi
     transition(sync_run_id:) { |sync_run| sync_run.acknowledge_voting_page!(page:) }
   end
 
+  def self.hydrate_voting(external_id:)
+    Camara::Ingestion::HydrateVoting.call(external_id:)
+  end
+
+  def self.record_voting_hydration_failure!(...)
+    Camara::Ingestion::RecordVotingHydrationFailure.call(...)
+  end
+
   def self.fail_running!(sync_run_id:, error:)
     sync_run = Camara::Ingestion::SyncRun.find_by(id: sync_run_id)
     return unless sync_run

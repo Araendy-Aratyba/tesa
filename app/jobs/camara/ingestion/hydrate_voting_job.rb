@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-class Camara::Ingestion::HydrateVotingJob < ApplicationJob
-  queue_as :camara_hydration
-  self.enqueue_after_transaction_commit = true
-
-  def perform(external_id:)
-    Camara::Ingestion::HydrateVoting.call(external_id:)
+# Keep already serialized jobs executable across the rollout.
+class Camara::Ingestion::HydrateVotingJob < Camara::Legislation::HydrateVotingJob
+  def perform(external_id:, sync_run_id: nil)
+    super(external_id:, sync_run_id:)
   end
 end
