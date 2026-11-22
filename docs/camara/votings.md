@@ -19,7 +19,8 @@ operações em lote. Não se deduplicam votações diferentes por data ou descri
 | `descricao` | `description` | Texto original, sem extrair resultado por inferência. |
 | `aprovacao` | `approved` | `1` → `true`, `0` → `false`, ausente/nulo → `nil`. |
 | `uri` | `source_uri` | URI original obrigatória. |
-| objeto completo | `raw_payload` | Objeto JSONB obrigatório, não vazio; preserva campos desconhecidos e relações. |
+| resumo completo | `raw_payload` | Objeto JSONB obrigatório, preservado pela importação da listagem. |
+| detalhe completo | `detail_raw_payload` | Objeto JSONB opcional, preenchido pela hidratação. Preserva relações publicadas e campos desconhecidos do detalhe. |
 | momento da coleta | `fetched_at` | Instante obrigatório gerado pela ingestão. |
 
 O mapper `Camara::Legislation::Mappers::Voting.call(payload, fetched_at:)`
@@ -34,6 +35,24 @@ a trait `:rejected` prepara esse valor técnico e não comprova o motivo.
 Órgão, evento, descrição e instante de registro podem permanecer desconhecidos.
 Não há FK nem proposição única associada: objetos possíveis e proposições
 afetadas continuam distintos no payload até a modelagem das relações.
+
+## Hidratação
+
+`Camara::Ingestion::HydrateVoting.call(external_id:)` busca o detalhe, os
+votos e as orientações de uma votação já importada. Legislation aplica os
+três recursos juntos depois de validar as respostas e mapear os registros.
+A listagem pode atualizar o resumo sem apagar o payload detalhado ou os
+identificadores de órgão e evento que omitiu.
+
+Cada recurso guarda seu instante de coleta nas colunas `detail_hydrated_at`,
+`votes_hydrated_at` e `orientations_hydrated_at`. O resultado informa as
+contagens e esses instantes. Uma observação anterior às já persistidas é
+descartada com status `superseded`. Se a fonte falhar, `FetchError` identifica
+o recurso afetado e os já obtidos, com a exceção original como causa.
+
+A migração adiciona quatro colunas anuláveis. Votações já importadas
+continuam disponíveis e ganham os campos na primeira hidratação. Para
+reverter o código sem perder os detalhes coletados, mantenha as colunas.
 
 ## Datas e fuso horário
 
