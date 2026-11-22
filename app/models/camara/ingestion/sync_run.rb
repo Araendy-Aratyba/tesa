@@ -73,7 +73,16 @@ class Camara::Ingestion::SyncRun < ApplicationRecord
     self
   end
 
-  def record_imported_page!(page:, persisted_count:)
+  def configure_voting_pagination!
+    with_lock do
+      ensure_status!(:running)
+      update!(filters: yield(filters, page))
+    end
+
+    self
+  end
+
+  def record_imported_page!(page:, persisted_count:, exhausted: false)
     unless page.is_a?(Integer) && page.positive? && persisted_count.is_a?(Integer) && persisted_count >= 0
       raise InvalidProgress, "expected a positive page and a nonnegative persisted count"
     end
@@ -84,7 +93,10 @@ class Camara::Ingestion::SyncRun < ApplicationRecord
       raise InvalidProgress, "cannot skip an imported page" if page > checkpoint + 1
 
       if page > checkpoint
-        update!(page:, processed_count: processed_count + persisted_count)
+        raise InvalidProgress, "voting pagination is already complete" if pagination_completed_at
+
+        update!(page:, processed_count: processed_count + persisted_count,
+          pagination_completed_at: (Time.current if exhausted))
       end
     end
 
@@ -159,6 +171,7 @@ class Camara::Ingestion::SyncRun < ApplicationRecord
     normalized_filters = filters.stringify_keys
     missing_filters = required_filters.reject { |filter| normalized_filters[filter].present? }
     return if missing_filters.empty?
+    return if resource == "votings" && normalized_filters["mode"] == "incremental" && missing_filters == required_filters
 
     errors.add(:filters, "must include #{missing_filters.join(', ')} for #{resource}")
   end

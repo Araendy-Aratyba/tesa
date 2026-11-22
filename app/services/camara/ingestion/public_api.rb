@@ -8,6 +8,7 @@ module Camara::Ingestion::PublicApi
     :filters,
     :page,
     :cursor,
+    :pagination_completed_at,
     :processed_count,
     :failed_count,
     :started_at,
@@ -24,8 +25,16 @@ module Camara::Ingestion::PublicApi
     transition(sync_run_id:) { |sync_run| sync_run.record_progress!(**progress) }
   end
 
-  def self.record_imported_page!(sync_run_id:, page:, persisted_count:)
-    transition(sync_run_id:) { |sync_run| sync_run.record_imported_page!(page:, persisted_count:) }
+  def self.fetch(sync_run_id:)
+    snapshot(Camara::Ingestion::SyncRun.find(sync_run_id))
+  end
+
+  def self.configure_voting_pagination!(sync_run_id:, &block)
+    transition(sync_run_id:) { |sync_run| sync_run.configure_voting_pagination!(&block) }
+  end
+
+  def self.record_imported_page!(sync_run_id:, page:, persisted_count:, exhausted: false)
+    transition(sync_run_id:) { |sync_run| sync_run.record_imported_page!(page:, persisted_count:, exhausted:) }
   end
 
   def self.succeed!(sync_run_id:)
@@ -51,6 +60,7 @@ module Camara::Ingestion::PublicApi
       filters: deep_frozen_copy(sync_run.filters),
       page: sync_run.page,
       cursor: immutable_string(sync_run.cursor),
+      pagination_completed_at: sync_run.pagination_completed_at,
       processed_count: sync_run.processed_count,
       failed_count: sync_run.failed_count,
       started_at: sync_run.started_at,

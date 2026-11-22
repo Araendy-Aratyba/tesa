@@ -65,6 +65,38 @@ Reprocessar uma página aplica correções da fonte com o mesmo ID e mantém a
 contagem acumulada. Exceções de HTTP, contrato ou persistência são propagadas
 ao chamador, que controla a conclusão ou falha da execução.
 
+### Paginação retomável
+
+`Camara::Ingestion::PaginateVotings.call(sync_run_id:)` processa até uma
+página por chamada e retorna `status`, `page`, `next_page` e o resultado da
+importação quando houve consulta. O chamador usa `next_page` para decidir
+quando prosseguir. O coordenador mantém o progresso no `SyncRun`, e
+`Legislation` continua responsável pela persistência das votações.
+
+- `continue` indica a próxima página após o último checkpoint.
+- `complete` indica que uma página curta ou vazia foi confirmada. O instante
+  `pagination_completed_at` é gravado com o checkpoint, depois do commit da
+  página. A execução permanece disponível para as etapas seguintes.
+- `page_limit_reached` indica que o limite foi atingido com a última página
+  cheia. O limite é salvo em `filters["max_pages"]` e o padrão é 1.000 páginas.
+
+Novas execuções começam com 100 itens por página e ordenação por `id`
+crescente. O tamanho e a ordenação ficam nos filtros. Execuções com checkpoint
+criado pela importação anterior preservam a ordem original por
+`dataHoraRegistro` decrescente, quando ainda não há ordem registrada.
+
+Sem datas, a API da Câmara usa uma janela móvel de 30 dias. No Tesa, use
+`filters: { "mode" => "incremental" }` para registrar uma janela fixa na
+primeira tentativa. Ela inclui o dia atual e até os 29 dias anteriores do
+mesmo ano civil, no fuso da aplicação. Uma tentativa posterior usa as mesmas
+datas. Para alcançar o ano anterior, crie outra execução com o intervalo
+explícito.
+
+O marcador de conclusão é opcional e a migração preserva checkpoints
+existentes. Uma execução antiga sem marcador pode confirmar a página
+seguinte ao retomar. Se for preciso voltar ao código anterior, mantenha a
+coluna para preservar os marcadores registrados.
+
 Os scopes locais `during(date_range)`, `for_body(external_id)` e
 `with_known_result` são combináveis. O período inclui as extremidades de um
 Range inclusivo. Resultado conhecido inclui tanto `true` como `false`.
