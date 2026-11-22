@@ -39,6 +39,8 @@ bin/setup --skip-server
 pnpm install --frozen-lockfile
 ```
 
+Para processar variantes de imagem em uma instalação local, instale a biblioteca libvips. No macOS, use `brew install vips`. As imagens Docker já incluem a biblioteca.
+
 O Dev Container inclui Ruby 3.4.13, Node.js, pnpm e um serviço PostgreSQL. Ao abri-lo, o comando de preparação é executado automaticamente.
 
 ## Desenvolvimento
