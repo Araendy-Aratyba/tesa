@@ -8,17 +8,19 @@ class Camara::Ingestion::StartRepresentativeSync
     new(...).call
   end
 
-  def initialize(resource:, external_id: nil)
+  def initialize(resource:, external_id: nil, legislature_id: nil)
     @resource = resource.to_s
-    Camara::Ingestion::RepresentativeCatalogs.fetch(@resource)
-    @filters = if external_id.nil?
-      { "mode" => "catalog" }
-    else
-      unless external_id.to_s.match?(/\A[1-9][0-9]*\z/)
-        raise ArgumentError, "expected a positive external ID"
-      end
+    catalogue = Camara::Ingestion::RepresentativeCatalogs.fetch(@resource)
+    @filters = if !external_id.nil?
+      raise ArgumentError, "detail sync does not take a legislature filter" unless legislature_id.nil?
 
-      { "mode" => "detail", "external_id" => external_id.to_s }
+      { "mode" => "detail", "external_id" => identifier!(external_id) }
+    elsif catalogue.legislature_scoped
+      { "mode" => "catalog", "legislature_id" => identifier!(legislature_id) }
+    else
+      raise ArgumentError, "catalogue does not take a legislature filter" unless legislature_id.nil?
+
+      { "mode" => "catalog" }
     end
   end
 
@@ -34,6 +36,14 @@ class Camara::Ingestion::StartRepresentativeSync
   end
 
   private
+
+  def identifier!(value)
+    unless (value.is_a?(Integer) || value.is_a?(String)) && value.to_s.match?(/\A[1-9][0-9]*\z/)
+      raise ArgumentError, "expected a positive external ID"
+    end
+
+    value.to_s
+  end
 
   def claim_run
     model = Camara::Ingestion::SyncRun

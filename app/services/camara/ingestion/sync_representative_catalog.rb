@@ -44,8 +44,9 @@ class Camara::Ingestion::SyncRepresentativeCatalog
     end
     raise ArgumentError, "requested page would skip the checkpoint" unless @page == checkpoint + 1
 
-    page = catalogue.source.fetch_page(page: @page)
-    result = import(catalogue, page.records)
+    scope = catalogue.legislature_scoped ? { legislature_id: Integer(run.filters.fetch("legislature_id"), 10) } : {}
+    page = catalogue.source.fetch_page(page: @page, **scope)
+    result = import(catalogue, page.records, **scope)
     run.confirm_catalog_page!(page: @page, record_count: result.record_count, complete: page.next_page.nil?)
     raise PageLimitReached, "representative catalogue reached its page limit" if page.next_page && @page == MAX_PAGES
 
@@ -62,8 +63,8 @@ class Camara::Ingestion::SyncRepresentativeCatalog
     Result.new(next_page: nil)
   end
 
-  def import(catalogue, payloads, expected_id: nil)
+  def import(catalogue, payloads, expected_id: nil, **scope)
     Camara::Representatives::PublicApi.public_send(catalogue.import_method,
-      payloads:, fetched_at: Time.current, expected_id:)
+      payloads:, fetched_at: Time.current, expected_id:, **scope)
   end
 end

@@ -8,4 +8,8 @@ module Camara::Representatives::PublicApi
   def self.import_parties(...)
     Camara::Representatives::ImportParties.call(...)
   end
+
+  def self.import_deputies(...)
+    Camara::Representatives::ImportDeputies.call(...)
+  end
 end

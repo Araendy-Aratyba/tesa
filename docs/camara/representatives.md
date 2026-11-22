@@ -52,3 +52,26 @@ start.call(resource: :parties, external_id: 36898)
 Uma importação pela primeira vez via detalhe também preserva os campos de
 identidade e nome. Uma execução da lista atualiza essas informações quando a
 Câmara publica um valor posterior.
+
+## Deputados
+
+A lista exige o ID da legislatura consultada. Essa legislatura pode ainda
+não ter sido importada. Cada linha da lista é uma observação, e o catálogo
+conserva variantes do mesmo deputado na mesma legislatura. A identidade
+permanece única. Para cada variante, `first_seen_at` e `last_seen_at` são
+instantes de coleta. O total da execução conta linhas recebidas por página
+confirmada, incluindo variantes e linhas idênticas devolvidas pela fonte.
+
+```ruby
+start = Camara::Ingestion::StartRepresentativeSync
+start.call(resource: :deputies, legislature_id: 56)
+start.call(resource: :deputies, external_id: 62881)
+```
+
+Hidrate separadamente IDs selecionados. O detalhe válido fornece os campos do
+cadastro atual em `ultimoStatus`. A identidade e suas observações continuam
+consultáveis quando o detalhe falta. `Deputy.with_electoral_name(name)`,
+`from_state(uf)` e `with_situation(situation)` consultam o cadastro hidratado.
+O payload bruto do detalhe é interno e pode incluir dados pessoais. As
+observações sem vigência registrada não atribuem filiação a uma data e os
+votos preservam a filiação publicada em cada snapshot.

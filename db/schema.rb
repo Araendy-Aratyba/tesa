@@ -10,9 +10,46 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_22_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_110000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "camara_deputies", force: :cascade do |t|
+    t.string "external_id", null: false
+    t.string "source_uri", null: false
+    t.string "civil_name"
+    t.string "electoral_name"
+    t.string "state_acronym"
+    t.string "situation"
+    t.string "party_acronym"
+    t.string "party_source_uri"
+    t.string "current_legislature_external_id"
+    t.jsonb "raw_payload"
+    t.datetime "fetched_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((electoral_name)::text)", name: "index_camara_deputies_on_lower_electoral_name"
+    t.index ["external_id"], name: "index_camara_deputies_on_external_id", unique: true
+    t.index ["situation"], name: "index_camara_deputies_on_situation"
+    t.index ["state_acronym"], name: "index_camara_deputies_on_state_acronym"
+    t.check_constraint "(raw_payload IS NULL) = (fetched_at IS NULL)", name: "camara_deputies_detail_provenance"
+    t.check_constraint "jsonb_typeof(raw_payload) = 'object'::text", name: "camara_deputies_payload_object"
+  end
+
+  create_table "camara_deputy_listing_observations", force: :cascade do |t|
+    t.bigint "deputy_id", null: false
+    t.string "legislature_external_id", null: false
+    t.string "payload_fingerprint", limit: 64, null: false
+    t.jsonb "raw_payload", null: false
+    t.datetime "first_seen_at", null: false
+    t.datetime "last_seen_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deputy_id", "legislature_external_id", "payload_fingerprint"], name: "index_camara_deputy_listing_identity", unique: true
+    t.index ["legislature_external_id"], name: "index_camara_deputy_listings_on_legislature_external_id"
+    t.check_constraint "first_seen_at <= last_seen_at", name: "camara_deputy_listing_ordered_observation"
+    t.check_constraint "jsonb_typeof(raw_payload) = 'object'::text", name: "camara_deputy_listing_payload_object"
+  end
 
   create_table "camara_legislatures", force: :cascade do |t|
     t.string "external_id", null: false
@@ -160,6 +197,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_100000) do
     t.check_constraint "jsonb_typeof(raw_payload) = 'object'::text", name: "camara_votings_payload_object"
   end
 
+  add_foreign_key "camara_deputy_listing_observations", "camara_deputies", column: "deputy_id", on_delete: :cascade
   add_foreign_key "camara_orientations", "camara_votings", column: "voting_id"
   add_foreign_key "camara_votes", "camara_votings", column: "voting_id"
   add_foreign_key "camara_voting_hydration_failures", "camara_sync_runs", column: "sync_run_id", on_delete: :cascade
