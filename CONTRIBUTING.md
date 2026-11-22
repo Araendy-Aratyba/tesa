@@ -21,7 +21,7 @@ nunca por uma issue pública.
 
 ## Preparando o ambiente
 
-O projeto usa Ruby 3.4.6, Rails 8.1.3.1, PostgreSQL, pnpm e Node.js. As versões
+O projeto usa Ruby 3.4.13, Rails 8.1.4.1, PostgreSQL, pnpm e Node.js. As versões
 fixadas no repositório devem ser respeitadas.
 
 Faça um fork, clone-o e crie uma branch descritiva:
@@ -29,8 +29,8 @@ Faça um fork, clone-o e crie uma branch descritiva:
 ```bash
 git clone git@github.com:SEU_USUARIO/tesa.git
 cd tesa
-rbenv install -s 3.4.6
-rbenv local 3.4.6
+rbenv install -s 3.4.13
+rbenv local 3.4.13
 bin/setup --skip-server
 pnpm install --frozen-lockfile
 gh issue develop 123 \

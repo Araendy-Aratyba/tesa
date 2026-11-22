@@ -7,7 +7,7 @@ on:
 
 jobs:
   scan_ruby:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
@@ -25,7 +25,7 @@ jobs:
         run: bin/bundler-audit
 
   scan_js:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
@@ -49,7 +49,7 @@ jobs:
         run: pnpm audit --audit-level high
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       RUBOCOP_CACHE_ROOT: tmp/rubocop
     steps:
@@ -84,7 +84,7 @@ jobs:
         run: pnpm lint:erb
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       DB_HOST: localhost
       RAILS_ENV: test
