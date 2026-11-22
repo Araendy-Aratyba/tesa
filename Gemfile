@@ -5,7 +5,7 @@ gem "rails", "~> 8.1.3", ">= 8.1.3.1"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
-gem "pg", "~> 1.1"
+gem "pg", "~> 1.7"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -40,7 +40,8 @@ gem "bootsnap", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.2"
+gem "ruby-vips", "~> 2.0", require: false
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -65,11 +66,11 @@ group :development do
   gem "web-console"
 
   # HTML-aware ERB parser used by the Herb development toolchain
-  gem "herb", "~> 0.10.3", require: false
+  gem "herb", "~> 0.11.2", require: false
 end
 
 group :test do
   # Browser-backed RSpec system specs for Hotwire interactions
   gem "capybara", "~> 3.40"
-  gem "selenium-webdriver", "~> 4.48"
+  gem "selenium-webdriver", "~> 4.53"
 end
