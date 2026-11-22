@@ -82,7 +82,7 @@ class Camara::Ingestion::SyncRun < ApplicationRecord
     self
   end
 
-  def record_imported_page!(page:, persisted_count:, exhausted: false)
+  def record_imported_page!(page:, persisted_count:, exhausted: false, voting_ids: nil)
     unless page.is_a?(Integer) && page.positive? && persisted_count.is_a?(Integer) && persisted_count >= 0
       raise InvalidProgress, "expected a positive page and a nonnegative persisted count"
     end
@@ -96,17 +96,27 @@ class Camara::Ingestion::SyncRun < ApplicationRecord
         raise InvalidProgress, "voting pagination is already complete" if pagination_completed_at
 
         update!(page:, processed_count: processed_count + persisted_count,
-          pagination_completed_at: (Time.current if exhausted))
+          pagination_completed_at: (Time.current if exhausted), pending_voting_ids: voting_ids)
       end
     end
 
     self
   end
 
-  def fail!(error:)
+  def acknowledge_voting_page!(page:)
+    with_lock do
+      update!(pending_voting_ids: nil) if self.page == page && pending_voting_ids
+    end
+
+    self
+  end
+
+  def fail!(error:, only_if_running: false)
     raise ArgumentError, "error must respond to #message" unless error.respond_to?(:message)
 
     with_lock do
+      next if only_if_running && !running?
+
       ensure_status!(:running)
       update!(
         status: :failed,

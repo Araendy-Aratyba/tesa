@@ -3,16 +3,18 @@
 class Camara::Ingestion::PaginateVotings
   PAGE_SIZE = 100
   DEFAULT_MAX_PAGES = 1_000
-  Result = Data.define(:status, :page, :next_page, :import_result)
+  Result = Data.define(:status, :page, :next_page, :import_result, :voting_ids, :start_date, :end_date)
   class InvalidRequest < ArgumentError; end
 
-  def self.call(sync_run_id:, client: CongregaPlenum::VotingsService)
-    new(sync_run_id:, client:).call
+  def self.call(...)
+    new(...).call
   end
 
-  def initialize(sync_run_id:, client:)
+  def initialize(sync_run_id:, client: CongregaPlenum::VotingsService, page: nil, start_date: nil, end_date: nil)
     @sync_run_id = sync_run_id
     @client = client
+    @requested_page = page
+    @requested_dates = [ start_date, end_date ]
   end
 
   def call
@@ -20,14 +22,31 @@ class Camara::Ingestion::PaginateVotings
       raise InvalidRequest, "voting pagination must run outside a database transaction"
     end
 
+    if @requested_page && Camara::Ingestion::PublicApi.fetch(sync_run_id: @sync_run_id).status != "running"
+      return skipped
+    end
+
     run = Camara::Ingestion::PublicApi.configure_voting_pagination!(sync_run_id: @sync_run_id) do |filters, checkpoint|
       configured_filters(filters, checkpoint)
+    end
+    if @requested_page && @requested_page <= run.page.to_i
+      return skipped unless @requested_page == run.page && run.pending_voting_ids
+
+      return result_for(run, page: @requested_page)
     end
     return result_for(run) if run.pagination_completed_at || run.page.to_i >= run.filters.fetch("max_pages")
 
     page = run.page.to_i + 1
-    result = Camara::Ingestion::ImportVotingsPage.call(sync_run_id: @sync_run_id, page:, client: @client)
+    if @requested_page && @requested_page != page
+      raise InvalidRequest, "requested voting page would skip the checkpoint"
+    end
+
+    result = Camara::Ingestion::ImportVotingsPage.call(
+      sync_run_id: @sync_run_id, page:, client: @client, retain_voting_ids: !@requested_page.nil?
+    )
     confirmed_run = Camara::Ingestion::PublicApi.fetch(sync_run_id: @sync_run_id)
+    return skipped if @requested_page && (confirmed_run.page != page || !confirmed_run.pending_voting_ids)
+
     result_for(confirmed_run, page:, import_result: result)
   end
 
@@ -36,7 +55,10 @@ class Camara::Ingestion::PaginateVotings
   def configured_filters(filters, checkpoint)
     validate_limits!(filters, checkpoint)
     filters = resolve_dates(filters)
-    Camara::Ingestion::VotingsDateRange.call(filters)
+    dates = Camara::Ingestion::VotingsDateRange.call(filters).map(&:iso8601)
+    if @requested_dates.any? && @requested_dates != dates
+      raise InvalidRequest, "voting page dates must match the sync run"
+    end
 
     # A checkpoint from T06 used the client's defaults before ordering was stored.
     order = checkpoint ? CongregaPlenum::VotingsService::DEFAULT_ORDER : "ASC"
@@ -45,7 +67,9 @@ class Camara::Ingestion::PaginateVotings
       "order" => filters["order"] || order,
       "order_by" => filters["order_by"] || order_by,
       "max_pages" => filters.fetch("max_pages", DEFAULT_MAX_PAGES),
-      "items_per_page" => PAGE_SIZE
+      "items_per_page" => PAGE_SIZE,
+      "start_date" => dates.first,
+      "end_date" => dates.last
     )
   end
 
@@ -75,12 +99,19 @@ class Camara::Ingestion::PaginateVotings
   end
 
   def result_for(run, page: nil, import_result: nil)
-    if run.pagination_completed_at
-      Result.new(status: :complete, page:, next_page: nil, import_result:)
+    status, next_page = if run.pagination_completed_at
+      [ :complete, nil ]
     elsif run.page.to_i >= run.filters.fetch("max_pages")
-      Result.new(status: :page_limit_reached, page:, next_page: nil, import_result:)
+      [ :page_limit_reached, nil ]
     else
-      Result.new(status: :continue, page:, next_page: run.page.to_i + 1, import_result:)
+      [ :continue, run.page.to_i + 1 ]
     end
+    Result.new(status:, page:, next_page:, import_result:, voting_ids: run.pending_voting_ids,
+      start_date: run.filters.fetch("start_date"), end_date: run.filters.fetch("end_date"))
+  end
+
+  def skipped
+    Result.new(status: :skipped, page: nil, next_page: nil, import_result: nil, voting_ids: nil,
+      start_date: nil, end_date: nil)
   end
 end

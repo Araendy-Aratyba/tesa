@@ -9,11 +9,12 @@ class Camara::Ingestion::ImportVotingsPage
     new(...).call
   end
 
-  def initialize(sync_run_id:, page:, items_per_page: nil, client: CongregaPlenum::VotingsService)
+  def initialize(sync_run_id:, page:, items_per_page: nil, client: CongregaPlenum::VotingsService, retain_voting_ids: false)
     @sync_run_id = sync_run_id
     @page = page
     @items_per_page = items_per_page
     @client = client
+    @retain_voting_ids = retain_voting_ids
   end
 
   def call
@@ -35,7 +36,8 @@ class Camara::Ingestion::ImportVotingsPage
     voting_ids = Camara::Legislation::PublicApi.import_votings_page(payloads:, fetched_at: Time.current)
     exhausted = payloads.length < items_per_page
     Camara::Ingestion::PublicApi.record_imported_page!(
-      sync_run_id: @sync_run_id, page: @page, persisted_count: voting_ids.length, exhausted:
+      sync_run_id: @sync_run_id, page: @page, persisted_count: voting_ids.length, exhausted:,
+      voting_ids: (voting_ids if @retain_voting_ids)
     )
 
     Result.new(
