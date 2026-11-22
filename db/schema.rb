@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_22_050000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_060000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -98,6 +98,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_050000) do
     t.datetime "registered_at"
     t.string "source_uri", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "detail_raw_payload"
+    t.datetime "detail_hydrated_at"
+    t.datetime "votes_hydrated_at"
+    t.datetime "orientations_hydrated_at"
     t.index ["body_external_id"], name: "index_camara_votings_on_body_external_id"
     t.index ["event_external_id"], name: "index_camara_votings_on_event_external_id"
     t.index ["external_id"], name: "index_camara_votings_on_external_id", unique: true

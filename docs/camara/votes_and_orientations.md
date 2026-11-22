@@ -12,6 +12,13 @@ Os mappers `Camara::Legislation::Mappers::Vote` e
 arquivo anual descritos abaixo. O vínculo local `voting_id` é atribuído pela
 ingestão. O resultado inclui o payload original e o horário de coleta em UTC.
 
+Na hidratação, somente os registros ausentes de uma coleção completa e
+validada são removidos. Uma lista explícita vazia indica que a fonte retornou
+zero registros publicados. A CongregaPlenum 0.2 também converte respostas
+sem `dados` ou com `dados: null` em listas vazias. O adaptador de hidratação
+valida a resposta antes dessa conversão e rejeita coleções com indicador de
+próxima página. Nesses casos, a versão já persistida é preservada.
+
 ## Votos individuais
 
 Cada registro em `camara_votes` é identificado por
