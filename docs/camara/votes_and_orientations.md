@@ -6,6 +6,12 @@
 parlamentar; uma orientação registra a recomendação de uma liderança. Nenhum
 deles representa presença ou ausência parlamentar.
 
+Os mappers `Camara::Legislation::Mappers::Vote` e
+`Camara::Legislation::Mappers::Orientation` recebem um objeto de cada vez em
+`.call(payload, fetched_at:)`. Aceitam os campos da API e os equivalentes do
+arquivo anual descritos abaixo. O vínculo local `voting_id` é atribuído pela
+ingestão. O resultado inclui o payload original e o horário de coleta em UTC.
+
 ## Votos individuais
 
 Cada registro em `camara_votes` é identificado por
@@ -18,8 +24,8 @@ parlamentar na mesma votação deve atualizar o registro existente.
 | `deputado_.id` / `deputado_id` | `deputy_external_id` | String obrigatória; não depende da existência futura de um model de deputado. |
 | `tipoVoto` / `voto` | `position` | Texto aberto e anulável; não usar enum nem inferir ausência. |
 | `dataRegistroVoto` / `dataHoraVoto` | `recorded_at` | Instante opcional em UTC depois do mapeamento. |
-| `deputado_.uri` | `deputy_source_uri` | URI publicada no momento do voto. |
-| `deputado_.nome` | `deputy_name` | Nome parlamentar publicado no momento do voto. |
+| `deputado_.uri` / `deputado_uri` | `deputy_source_uri` | URI publicada no momento do voto. |
+| `deputado_.nome` / `deputado_nome` | `deputy_name` | Nome parlamentar publicado no momento do voto. |
 | partido, UF e legislatura | `party_*`, `state_acronym`, `legislature_external_id` | Snapshot histórico; não é substituído pelo cadastro atual. |
 | foto e e-mail | `deputy_photo_url`, `deputy_email` | Snapshot opcional da fonte. |
 | objeto completo | `raw_payload` | Objeto JSONB obrigatório, preservado integralmente. |
@@ -38,12 +44,17 @@ Cada registro em `camara_orientations` é identificado por
 mapper deve derivar assim:
 
 1. quando existir `uriPartidoBloco`/`uriBancada`, usar `uri:<URI completa>`;
-2. sem URI, usar
-   `leadership:<codTipoLideranca>:<siglaPartidoBloco normalizada>`.
+2. sem URI na API, usar
+   `leadership:<codTipoLideranca>:<siglaPartidoBloco normalizada>`;
+3. em arquivo anual sem URI e sem código de liderança, usar
+   `bancada:<siglaBancada normalizada>`.
 
-O model recebe a chave pronta; a derivação e a normalização pertencem ao mapper
-da integração. `leadership_type`, `group_acronym`, `group_external_id` e
-`group_source_uri` preservam separadamente o snapshot que originou a chave.
+O mapper normaliza a sigla para a chave removendo os espaços nas extremidades,
+usando maiúsculas e normalização Unicode canônica. A sigla original permanece
+no snapshot. Sem URI, a sigla anual por si só não estabelece equivalência com
+uma bancada da API. `leadership_type`, `group_acronym`, `group_external_id`
+(de `codPartidoBloco`) e `group_source_uri` preservam separadamente os campos
+publicados.
 
 `position` também é texto aberto e anulável. No conjunto anual de 2026 foram
 observados `Sim`, `Não`, `Liberado`, `Obstrução` e valor vazio. Vazio não é
