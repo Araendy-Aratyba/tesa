@@ -24,6 +24,10 @@ module Camara::Ingestion::PublicApi
     transition(sync_run_id:) { |sync_run| sync_run.record_progress!(**progress) }
   end
 
+  def self.record_imported_page!(sync_run_id:, page:, persisted_count:)
+    transition(sync_run_id:) { |sync_run| sync_run.record_imported_page!(page:, persisted_count:) }
+  end
+
   def self.succeed!(sync_run_id:)
     transition(sync_run_id:) { |sync_run| sync_run.succeed! }
   end

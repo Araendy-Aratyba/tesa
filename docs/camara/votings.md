@@ -52,6 +52,19 @@ Instantes são persistidos em UTC; o texto original permanece no `raw_payload`.
 
 ## Leitura e operação
 
+`Camara::Ingestion::ImportVotingsPage.call(sync_run_id:, page:)` importa
+uma página fora de qualquer transação aberta pelo chamador. A execução deve
+estar em andamento e conter `start_date` e `end_date` no mesmo ano civil.
+Use `items_per_page` nos filtros para manter um tamanho fixo durante a execução.
+Quando ausente, vale o máximo configurado pela CongregaPlenum.
+
+O resultado contém a quantidade recebida, a quantidade gravada, os IDs
+externos e a próxima página possível quando a página estiver cheia. Uma
+página vazia encerra a paginação. O checkpoint é registrado após o commit.
+Reprocessar uma página aplica correções da fonte com o mesmo ID e mantém a
+contagem acumulada. Exceções de HTTP, contrato ou persistência são propagadas
+ao chamador, que controla a conclusão ou falha da execução.
+
 Os scopes locais `during(date_range)`, `for_body(external_id)` e
 `with_known_result` são combináveis. O período inclui as extremidades de um
 Range inclusivo. Resultado conhecido inclui tanto `true` como `false`.
