@@ -34,3 +34,21 @@ Uma execução com falha terminal pode ser iniciada de novo pelo Service.
 A gem aplica suas retentativas HTTP configuradas dentro de cada tentativa do
 job. O job permite até três tentativas para conexão, HTTP 429 e HTTP 5xx.
 Uma falha terminal preserva as páginas confirmadas e é registrada na execução.
+
+## Partidos
+
+O ID oficial é a identidade do partido. A sigla representa o valor publicado
+no catálogo e pode mudar ou se repetir entre IDs. A situação vem do detalhe,
+e uma atualização da lista preserva a última situação e o payload de detalhe.
+Uma ausência na lista conserva o cadastro existente. A coleta jamais
+reatribui a filiação publicada nos votos.
+
+```ruby
+start = Camara::Ingestion::StartRepresentativeSync
+start.call(resource: :parties)
+start.call(resource: :parties, external_id: 36898)
+```
+
+Uma importação pela primeira vez via detalhe também preserva os campos de
+identidade e nome. Uma execução da lista atualiza essas informações quando a
+Câmara publica um valor posterior.
