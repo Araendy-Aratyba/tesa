@@ -50,8 +50,9 @@ RSpec.describe Camara::Ingestion::SyncVotingsPageJob, type: :job do
     expect { perform_page }.to have_enqueued_job(described_class)
       .with(sync_run_id: sync_run.id, page: 2, **dates).on_queue("camara_sync")
 
-    hydration = enqueued_jobs.select { |job| job[:job] == Camara::Ingestion::HydrateVotingJob }
+    hydration = enqueued_jobs.select { |job| job[:job] == Camara::Legislation::HydrateVotingJob }
     expect(hydration.map { |job| job[:args].first.fetch("external_id") }).to match_array(ids)
+    expect(hydration.map { |job| job[:args].first.fetch("sync_run_id") }.uniq).to eq([ sync_run.id ])
     expect(hydration.map { |job| job[:queue] }.uniq).to eq([ "camara_hydration" ])
     expect(sync_run.reload).to have_attributes(page: 1, processed_count: 100, pending_voting_ids: nil)
 
@@ -63,8 +64,8 @@ RSpec.describe Camara::Ingestion::SyncVotingsPageJob, type: :job do
   it "enqueues hydration for a short final page without continuing pagination" do
     source_page(1).and_return([ payloads.first ])
 
-    expect { perform_page }.to have_enqueued_job(Camara::Ingestion::HydrateVotingJob)
-      .with(external_id: ids.first).on_queue("camara_hydration")
+    expect { perform_page }.to have_enqueued_job(Camara::Legislation::HydrateVotingJob)
+      .with(external_id: ids.first, sync_run_id: sync_run.id).on_queue("camara_hydration")
     expect(enqueued_jobs.count).to eq(1)
     expect(sync_run.reload).to have_attributes(page: 1, pagination_completed_at: be_present, status: "running")
   end
@@ -75,7 +76,8 @@ RSpec.describe Camara::Ingestion::SyncVotingsPageJob, type: :job do
     expect(sync_run.reload.pending_voting_ids).to eq([ ids.first ])
     source_page(1).and_raise("recovery must use the committed IDs")
 
-    expect { perform_page }.to have_enqueued_job(Camara::Ingestion::HydrateVotingJob).with(external_id: ids.first)
+    expect { perform_page }.to have_enqueued_job(Camara::Legislation::HydrateVotingJob)
+      .with(external_id: ids.first, sync_run_id: sync_run.id)
     expect(sync_run.reload).to have_attributes(processed_count: 1, pending_voting_ids: nil)
   end
 
@@ -114,7 +116,7 @@ RSpec.describe Camara::Ingestion::SyncVotingsPageJob, type: :job do
     source_page(1).and_return(payloads)
 
     expect { perform_page }.to raise_error(described_class::PageLimitReached)
-    expect(enqueued_jobs.map { |job| job[:job] }.uniq).to eq([ Camara::Ingestion::HydrateVotingJob ])
+    expect(enqueued_jobs.map { |job| job[:job] }.uniq).to eq([ Camara::Legislation::HydrateVotingJob ])
     expect(sync_run.reload).to have_attributes(status: "failed", page: 1, pending_voting_ids: ids)
   end
 

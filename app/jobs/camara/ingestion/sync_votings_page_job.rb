@@ -25,7 +25,7 @@ class Camara::Ingestion::SyncVotingsPageJob < ApplicationJob
     return unless result.page
 
     result.voting_ids.each do |external_id|
-      unless Camara::Ingestion::HydrateVotingJob.perform_later(external_id:)
+      unless Camara::Legislation::HydrateVotingJob.perform_later(external_id:, sync_run_id:)
         raise EnqueueError, "could not enqueue voting hydration"
       end
     end

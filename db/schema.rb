@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_22_070000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_080000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -83,6 +83,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_070000) do
     t.check_constraint "jsonb_typeof(raw_payload) = 'object'::text", name: "camara_votes_payload_object"
   end
 
+  create_table "camara_voting_hydration_failures", force: :cascade do |t|
+    t.bigint "sync_run_id", null: false
+    t.string "voting_external_id", null: false
+    t.string "job_id", null: false
+    t.integer "attempts", null: false
+    t.string "error_class", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sync_run_id", "voting_external_id"], name: "index_camara_hydration_failures_identity", unique: true
+    t.check_constraint "attempts > 0", name: "camara_hydration_failures_attempts_positive"
+  end
+
   create_table "camara_votings", force: :cascade do |t|
     t.boolean "approved"
     t.string "body_acronym"
@@ -113,4 +125,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_070000) do
 
   add_foreign_key "camara_orientations", "camara_votings", column: "voting_id"
   add_foreign_key "camara_votes", "camara_votings", column: "voting_id"
+  add_foreign_key "camara_voting_hydration_failures", "camara_sync_runs", column: "sync_run_id", on_delete: :cascade
 end

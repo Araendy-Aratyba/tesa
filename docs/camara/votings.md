@@ -142,6 +142,37 @@ cheia, o job envia as hidratações confirmadas e registra a falha do limite.
 A migração de `pending_voting_ids` é anulável. Para reverter o código,
 mantenha a coluna enquanto houver páginas pendentes de envio.
 
+### Hidratação pelo Solid Queue
+
+`Camara::Legislation::HydrateVotingJob.perform_later(external_id:, sync_run_id:)`
+recebe o identificador externo da votação como string e o ID da execução.
+O job chama a API pública de Ingestion para buscar os três recursos. O Service
+de Legislation valida e persiste os dados em uma transação por votação.
+O Solid Queue reserva uma vaga por votação, mesmo quando os jobs vêm de
+execuções diferentes, com expiração de 15 minutos para recuperar a vaga se
+um worker cair. A transação de Legislation também usa bloqueio por votação
+e índices únicos para proteger a gravação concorrente.
+
+Conexão, HTTP 429 e HTTP 5xx permitem até três tentativas do job, incluindo
+a primeira. As demais esperam um intervalo crescente com jitter. A gem faz
+até `CAMARA_API_RETRIES` retentativas por requisição dentro de cada tentativa
+do job. Com o padrão de três retentativas da gem, são até 12 chamadas por
+endpoint ao longo de uma execução do job com suas retentativas. Erros HTTP
+permanentes e payload inválido encerram o job na primeira ocorrência.
+
+Uma falha terminal fica visível nos jobs falhos do Solid Queue. A auditoria
+em `camara_voting_hydration_failures` guarda o ID do job, a classe da falha e
+o número de tentativas do job. `SyncRun.failed_count` aumenta uma vez por
+votação com falha terminal naquela execução. Um novo erro terminal para a
+mesma votação atualiza o registro existente. A auditoria é histórica e o
+job de páginas pode continuar importando os demais resumos. O resumo e a
+última hidratação confirmada permanecem disponíveis para consulta.
+
+Aplique a migração `20261122080000` antes de iniciar os workers com o novo
+código. Jobs legados continuam executáveis e carregam apenas o ID da votação.
+Para voltar ao código anterior, processe primeiro os jobs novos da fila,
+incluindo os agendados para retentativa, e preserve a tabela de auditoria.
+
 Os scopes locais `during(date_range)`, `for_body(external_id)` e
 `with_known_result` são combináveis. O período inclui as extremidades de um
 Range inclusivo. Resultado conhecido inclui tanto `true` como `false`.

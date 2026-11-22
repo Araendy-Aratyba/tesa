@@ -3,6 +3,9 @@
 class Camara::Ingestion::SyncRun < ApplicationRecord
   self.table_name = "camara_sync_runs"
 
+  has_many :voting_hydration_failures,
+    class_name: "Camara::Ingestion::VotingHydrationFailure", inverse_of: :sync_run
+
   FILTER_SCHEMAS = {
     "votings" => %w[start_date end_date]
   }.freeze
