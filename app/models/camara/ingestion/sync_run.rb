@@ -73,6 +73,24 @@ class Camara::Ingestion::SyncRun < ApplicationRecord
     self
   end
 
+  def record_imported_page!(page:, persisted_count:)
+    unless page.is_a?(Integer) && page.positive? && persisted_count.is_a?(Integer) && persisted_count >= 0
+      raise InvalidProgress, "expected a positive page and a nonnegative persisted count"
+    end
+
+    with_lock do
+      ensure_status!(:running)
+      checkpoint = self.page || 0
+      raise InvalidProgress, "cannot skip an imported page" if page > checkpoint + 1
+
+      if page > checkpoint
+        update!(page:, processed_count: processed_count + persisted_count)
+      end
+    end
+
+    self
+  end
+
   def fail!(error:)
     raise ArgumentError, "error must respond to #message" unless error.respond_to?(:message)
 
