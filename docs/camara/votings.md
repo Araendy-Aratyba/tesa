@@ -22,10 +22,12 @@ operações em lote. Não se deduplicam votações diferentes por data ou descri
 | objeto completo | `raw_payload` | Objeto JSONB obrigatório, não vazio; preserva campos desconhecidos e relações. |
 | momento da coleta | `fetched_at` | Instante obrigatório gerado pela ingestão. |
 
-O mapeamento de payload e a integração HTTP serão implementados em trabalho
-posterior. O model recebe atributos normalizados e não conhece a CongregaPlenum.
-O mapper deverá rejeitar valores inesperados de `aprovacao` antes da atribuição:
-o cast booleano genérico do Rails não valida o contrato externo.
+O mapper `Camara::Legislation::Mappers::Voting.call(payload, fetched_at:)`
+recebe um objeto retornado pela CongregaPlenum, de resumo ou de detalhe, e
+produz os atributos locais. A ingestão fornece `fetched_at` como um `Time`; o
+mapper preserva o payload original e converte o instante da coleta para UTC.
+Valores de `aprovacao` fora do contrato geram `Mappers::ContractError`, com o
+recurso e o campo. O model recebe os atributos normalizados.
 `false` significa não aprovado, o que também pode incluir quórum insuficiente;
 a trait `:rejected` prepara esse valor técnico e não comprova o motivo.
 
@@ -43,8 +45,8 @@ Horários com offset explícito conservam o instante indicado. Para horários se
 offset, a política local é interpretá-los em `Brasilia` (`America/Sao_Paulo`),
 conforme `config.time_zone`, usando as regras históricas de horário de verão
 desse fuso. Isso é uma decisão do Tesa, não uma garantia de offset da fonte.
-Na ingestão futura, o mapper deve usar esse fuso explicitamente, rejeitar datas
-inválidas e tratar horários locais ambíguos/inexistentes como erro de contrato.
+O mapper usa `Time.zone`, rejeita datas inválidas e reporta horários locais
+ambíguos ou inexistentes como erros de contrato.
 Instantes são persistidos em UTC; o texto original permanece no `raw_payload`.
 `occurred_on` é `date` e não passa por conversão de fuso.
 

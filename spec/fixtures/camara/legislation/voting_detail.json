@@ -1,0 +1,17 @@
+{
+  "id": "0001234-35",
+  "uri": "https://dadosabertos.camara.leg.br/api/v2/votacoes/0001234-35",
+  "data": "2026-08-04",
+  "dataHoraRegistro": "2026-08-05T02:25:50.250-02:00",
+  "siglaOrgao": "PLEN",
+  "idOrgao": 900,
+  "uriOrgao": "https://dadosabertos.camara.leg.br/api/v2/orgaos/900",
+  "idEvento": 91234,
+  "uriEvento": "https://dadosabertos.camara.leg.br/api/v2/eventos/91234",
+  "descricao": "Resultado registrado após a deliberação.",
+  "aprovacao": 0,
+  "objetosPossiveis": [{ "id": 1234, "siglaTipo": "PL", "numero": 90 }],
+  "proposicoesAfetadas": [{ "id": 4567, "siglaTipo": "PL", "numero": 91 }],
+  "efeitosRegistrados": [{ "data": "2026-08-04", "descricao": "Deliberação concluída." }],
+  "campoNovo": { "texto": "Informação adicional" }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "0001234-35",
+  "uri": "https://dadosabertos.camara.leg.br/api/v2/votacoes/0001234-35",
+  "data": "2026-08-04",
+  "dataHoraRegistro": "2026-08-05T01:25:50",
+  "siglaOrgao": "PLEN",
+  "uriOrgao": "https://dadosabertos.camara.leg.br/api/v2/orgaos/900",
+  "uriEvento": null,
+  "descricao": "Aprovada a redação final da proposição."
+}

@@ -1,0 +1,15 @@
+{
+  "tipoVoto": "Obstrução",
+  "dataRegistroVoto": "2026-08-04T18:30:00",
+  "deputado_": {
+    "id": 900001,
+    "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/900001",
+    "nome": "João da Conceição",
+    "siglaPartido": "PFX",
+    "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/900",
+    "siglaUf": "SP",
+    "idLegislatura": 57,
+    "urlFoto": "https://example.org/fotos/900001.jpg",
+    "email": "parlamentar@example.org"
+  }
+}
