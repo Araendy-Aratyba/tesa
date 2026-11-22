@@ -116,6 +116,32 @@ existentes. Uma execução antiga sem marcador pode confirmar a página
 seguinte ao retomar. Se for preciso voltar ao código anterior, mantenha a
 coluna para preservar os marcadores registrados.
 
+### Coleta pelo Solid Queue
+
+`Camara::Ingestion::SyncVotingsPageJob.perform_later(sync_run_id:, page:)`
+trabalha na fila `camara_sync`. A execução deve estar em andamento. Se o
+chamador passar `start_date` e `end_date`, ambas devem ser strings ISO
+iguais às datas da execução. O primeiro job do modo incremental pode
+omiti-las. As páginas seguintes carregam as datas já fixadas.
+
+O Solid Queue usa uma vaga por execução, com expiração de 15 minutos para
+recuperação se um worker cair. Depois do commit da página, o checkpoint guarda
+os IDs pendentes de envio. O job enfileira uma hidratação por ID em
+`camara_hydration`, enfileira a próxima página quando indicada e confirma o
+envio. Reexecutar uma página já enviada é inócuo. Uma interrupção durante o
+envio pode repetir jobs já aceitos pela fila. A hidratação e o checkpoint
+são idempotentes.
+
+A CongregaPlenum mantém as próprias retentativas por requisição. O job
+permite até três tentativas para falhas de conexão, limite de taxa ou HTTP
+5xx. Falhas permanentes e esgotamento de tentativas são registrados no
+`SyncRun`. Uma página final válida encerra a paginação e deixa a execução
+disponível para as outras etapas. Se o limite for atingido com uma página
+cheia, o job envia as hidratações confirmadas e registra a falha do limite.
+
+A migração de `pending_voting_ids` é anulável. Para reverter o código,
+mantenha a coluna enquanto houver páginas pendentes de envio.
+
 Os scopes locais `during(date_range)`, `for_body(external_id)` e
 `with_known_result` são combináveis. O período inclui as extremidades de um
 Range inclusivo. Resultado conhecido inclui tanto `true` como `false`.
