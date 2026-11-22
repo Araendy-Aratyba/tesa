@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_08_003000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_050000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -47,6 +47,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_08_003000) do
     t.datetime "started_at"
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
+    t.datetime "pagination_completed_at"
     t.index ["created_at"], name: "index_camara_sync_runs_on_created_at"
     t.index ["resource"], name: "index_camara_sync_runs_on_resource"
     t.index ["status"], name: "index_camara_sync_runs_on_status"
