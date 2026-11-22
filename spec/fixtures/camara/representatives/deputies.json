@@ -1,0 +1,5 @@
+{
+  "first_listing": {"id": 10001, "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/10001", "nome": "Deputada Exemplo", "siglaPartido": "PFX", "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/123", "siglaUf": "DF", "idLegislatura": 56},
+  "second_listing": {"id": 10001, "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/10001", "nome": "Deputada Exemplo", "siglaPartido": "PFY", "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/123", "siglaUf": "DF", "idLegislatura": 56},
+  "detail": {"id": 10001, "uri": "https://dadosabertos.camara.leg.br/api/v2/deputados/10001", "nomeCivil": "Nome Civil Exemplo", "ultimoStatus": {"id": 10001, "nomeEleitoral": "Deputada Exemplo", "siglaPartido": "PFZ", "uriPartido": "https://dadosabertos.camara.leg.br/api/v2/partidos/125", "siglaUf": "SP", "idLegislatura": 57, "situacao": "Exercício"}}
+}

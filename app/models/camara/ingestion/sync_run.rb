@@ -9,7 +9,8 @@ class Camara::Ingestion::SyncRun < ApplicationRecord
   FILTER_SCHEMAS = {
     "votings" => %w[start_date end_date],
     "legislatures" => %w[mode],
-    "parties" => %w[mode]
+    "parties" => %w[mode],
+    "deputies" => %w[mode]
   }.freeze
   MAX_ERROR_CLASS_LENGTH = 255
   MAX_ERROR_MESSAGE_LENGTH = 1_000
