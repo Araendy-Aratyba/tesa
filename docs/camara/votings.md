@@ -233,3 +233,42 @@ importadores. Para atualizações da fonte, usar operação idempotente apoiada 
 índice único; este model não implementa a orquestração de importação.
 
 Fonte: [conceitos e limitações das votações nos Dados Abertos da Câmara](https://dadosabertos.camara.leg.br/howtouse/2020-02-07-dados-votacoes.html).
+
+### Piloto com a API oficial
+
+Use uma instância descartável de PostgreSQL e execute o piloto manualmente.
+O script exige `CAMARA_LIVE_PILOT=1`, ambiente de desenvolvimento e tabelas
+de execuções e votações vazias. Escolha um dia civil já encerrado.
+
+```bash
+docker run --rm -d --name tesa-camara-pilot \
+  -e POSTGRES_PASSWORD=postgres -p 127.0.0.1:55418:5432 postgres:16.15-alpine
+docker exec tesa-camara-pilot pg_isready -U postgres -h 127.0.0.1
+(
+  unset DATABASE_URL QUEUE_DATABASE_URL
+  export RAILS_ENV=development DB_HOST=127.0.0.1 DB_PORT=55418
+  export DB_USERNAME=postgres DB_PASSWORD=postgres
+  bin/rails db:prepare && \
+    CAMARA_LIVE_PILOT=1 bin/rails runner script/camara/voting_pilot.rb 2020-03-25
+)
+```
+
+Se o PostgreSQL ainda estiver iniciando, repita o `pg_isready` até aceitar
+conexões. O piloto executa os jobs reais usando uma fila em memória própria
+do processo. Ele consulta uma única página e hidrata até oito votações.
+Cada hidratação consulta detalhe, votos e orientações. O limite é de 25
+chamadas ao cliente e a gem usa timeout de conexão e leitura de 10 segundos.
+O piloto interrompe ao detectar retentativa agendada, e as retentativas
+internas da gem ficam desativadas apenas nesse processo.
+
+A saída JSON informa o ID do `SyncRun`, duração, checkpoint, IDs externos e
+contagens de filhos. O piloto encerra o `SyncRun` como `succeeded` após
+conferir a persistência de todos os jobs. Em caso de erro, o ID da execução
+fica disponível para examinar a auditoria no banco isolado.
+
+Depois de conferir a saída, remova o banco descartável encerrando o
+contêiner criado acima. O `--rm` remove o contêiner e seu volume anônimo.
+
+```bash
+docker stop tesa-camara-pilot
+```

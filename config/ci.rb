@@ -6,6 +6,8 @@ CI.run do
   step "Style: Ruby", "bin/rubocop"
   step "Templates: Herb", "pnpm lint:erb"
 
+  step "Autoloading: Zeitwerk", "bin/rails zeitwerk:check"
+
   step "Tests: RSpec", "bin/rspec"
 
   step "Security: Gem audit", "bin/bundler-audit"
