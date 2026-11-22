@@ -115,5 +115,8 @@ jobs:
       - name: Prepare test database
         run: bin/rails db:prepare
 
+      - name: Check Zeitwerk eager loading
+        run: bin/rails zeitwerk:check
+
       - name: Run RSpec
         run: bin/rspec
