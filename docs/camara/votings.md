@@ -116,6 +116,48 @@ existentes. Uma execução antiga sem marcador pode confirmar a página
 seguinte ao retomar. Se for preciso voltar ao código anterior, mantenha a
 coluna para preservar os marcadores registrados.
 
+### Iniciar uma sincronização anual
+
+Em desenvolvimento, prepare os bancos principal e de fila. Depois inicie
+o worker em um terminal e enfileire o comando em outro.
+
+```bash
+bin/rails db:prepare
+bin/jobs start --mode=async
+```
+
+```bash
+bin/rails -T camara
+bin/rails 'camara:sync_votings[2025]'
+```
+
+O modo `async` mantém os workers do Solid Queue no processo do supervisor
+local e usa a fila persistida no PostgreSQL. No Docker Compose, use
+`docker compose run --rm app` antes de cada comando. O comando anual retorna
+após enfileirar a primeira página. O worker faz as chamadas à Câmara e agenda
+as páginas e hidratações seguintes.
+
+O ano deve ter quatro dígitos e estar entre 1935 e o ano corrente no fuso
+da aplicação. A Câmara lista arquivos a partir de 1935 e há lacunas em
+anos históricos. O intervalo vai de 1º de janeiro a 31 de dezembro do ano
+informado. [Catálogo de arquivos da Câmara](https://dadosabertos.camara.leg.br/swagger/api.html?tab=staticfile)
+
+O comando imprime `sync_run_id` e o status inicial `running`. No console,
+consulte `Camara::Ingestion::PublicApi.fetch(sync_run_id: ID)` com o ID
+impresso. `page`, `processed_count`, `failed_count` e
+`pagination_completed_at` mostram o avanço. O marcador de paginação indica
+que todas as páginas foram lidas. A execução continua `running` ao fim da
+paginação e bloqueia outro disparo anual até atingir um estado terminal.
+A hidratação tem sua própria fila.
+
+Ano inválido, execução anual ativa para o mesmo intervalo ou rejeição da
+fila retornam código de saída 1. Em caso de duplicidade, a mensagem exibe o
+ID da execução existente. Se a fila rejeitar o envio, a execução recebe o
+status `failed` e uma nova chamada pode criar outra. Se o processo cair
+entre o commit do registro e o envio, confirme que o primeiro job está
+ausente da fila antes de reenfileirar `Camara::Ingestion::SyncVotingsPageJob`
+com `sync_run_id: ID` e `page: 1` para retomar a mesma execução.
+
 ### Coleta pelo Solid Queue
 
 `Camara::Ingestion::SyncVotingsPageJob.perform_later(sync_run_id:, page:)`
