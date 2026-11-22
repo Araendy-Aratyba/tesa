@@ -1,0 +1,4 @@
+{
+  "summary": {"id": 36898, "uri": "https://dadosabertos.camara.leg.br/api/v2/partidos/36898", "sigla": "PFX", "nome": "Partido Fictício"},
+  "retired_detail": {"id": 36898, "uri": "https://dadosabertos.camara.leg.br/api/v2/partidos/36898", "sigla": "PFX", "nome": "Partido Fictício", "status": {"data": "2007-02-01T10:00", "situacao": "Extinto"}}
+}

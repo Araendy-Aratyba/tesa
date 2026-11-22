@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_22_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,6 +49,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_090000) do
     t.index ["voting_id", "group_key"], name: "index_camara_orientations_identity", unique: true
     t.check_constraint "btrim(group_key::text) <> ''::text", name: "camara_orientations_group_key_present"
     t.check_constraint "jsonb_typeof(raw_payload) = 'object'::text", name: "camara_orientations_payload_object"
+  end
+
+  create_table "camara_parties", force: :cascade do |t|
+    t.string "external_id", null: false
+    t.string "source_uri", null: false
+    t.string "acronym", null: false
+    t.string "name", null: false
+    t.string "situation"
+    t.jsonb "raw_payload", null: false
+    t.datetime "fetched_at", null: false
+    t.jsonb "detail_raw_payload"
+    t.datetime "detail_fetched_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["acronym"], name: "index_camara_parties_on_acronym"
+    t.index ["external_id"], name: "index_camara_parties_on_external_id", unique: true
+    t.check_constraint "(detail_raw_payload IS NULL) = (detail_fetched_at IS NULL)", name: "camara_parties_detail_provenance"
+    t.check_constraint "jsonb_typeof(detail_raw_payload) = 'object'::text", name: "camara_parties_detail_object"
+    t.check_constraint "jsonb_typeof(raw_payload) = 'object'::text", name: "camara_parties_payload_object"
   end
 
   create_table "camara_sync_runs", force: :cascade do |t|

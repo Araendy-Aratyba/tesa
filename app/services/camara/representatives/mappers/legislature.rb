@@ -2,12 +2,7 @@
 
 module Camara::Representatives::Mappers::Legislature
   def self.call(payload, fetched_at:)
-    invalid!("dados") unless payload.is_a?(Hash)
-
-    number = Integer(payload["id"].to_s, 10, exception: false)
-    invalid!("id") unless number&.positive? && number.to_s == payload["id"].to_s
-    uri = payload["uri"]
-    invalid!("uri") unless uri.is_a?(String) && uri.present?
+    identity = Camara::Representatives::Mappers::Identity.call(payload, resource: :legislature)
     starts_on = date(payload, "dataInicio")
     ends_on = date(payload, "dataFim")
     invalid!("dataFim") if ends_on < starts_on
@@ -17,7 +12,7 @@ module Camara::Representatives::Mappers::Legislature
       invalid!("anoEleicao") unless election_year&.between?(1000, 9999)
     end
 
-    { external_id: number.to_s, number:, source_uri: uri, starts_on:, ends_on:, election_year:,
+    { **identity, number: identity.fetch(:external_id).to_i, starts_on:, ends_on:, election_year:,
       raw_payload: payload, fetched_at: }
   end
 
