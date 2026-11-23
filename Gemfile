@@ -58,7 +58,7 @@ group :development, :test do
 
   # RSpec and factories
   gem "factory_bot_rails", "~> 6.5"
-  gem "rspec-rails", "~> 8.0"
+  gem "rspec-rails", "~> 8.1"
 end
 
 group :development do
